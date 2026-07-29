@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Padres - Colegio Santa Teresa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <div class="flex h-screen overflow-hidden relative">
+        <!-- Menú Lateral -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="bg-blue-600 text-white p-2.5 rounded-lg shadow-lg">
+                        <i class="fa-solid fa-school text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-wide text-white">SANTA<span class="text-blue-400"> TERESA</span></span>
+                </div>
+                
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Menú Principal</p>
+                <nav class="space-y-2 text-sm font-medium">
+                    <div class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white transition-all cursor-default">
+                        <i class="fa-solid fa-children w-5"></i> Mi Estudiante
+                    </div>
+                </nav>
+            </div>
+            <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
+                <a href="index.html" class="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors text-sm font-bold">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                </a>
+            </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0">
+                <h1 class="text-2xl font-bold text-slate-800">Portal de Padres de Familia</h1>
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-slate-800">Familia Pérez</p>
+                        <p class="text-xs text-slate-400">Apoderado</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-6 md:p-8 flex-1">
+                <section class="space-y-6 fade-in">
+                    <div class="bg-blue-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <h2 class="text-2xl font-bold mb-1">Bienvenido, Familia Pérez</h2>
+                            <p class="text-blue-100 text-sm">Aquí puede monitorear el registro biométrico de ingreso y salida de su hijo en tiempo real.</p>
+                        </div>
+                        <i class="fa-solid fa-users absolute right-4 -bottom-6 text-8xl text-blue-500 opacity-30"></i>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800">Asistencia de Hoy</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Tarjeta del Hijo (Diseño estático simulando base de datos) -->
+                        <div class="bg-white border-green-200 rounded-2xl border shadow-md overflow-hidden flex flex-col">
+                            <div class="bg-green-500 text-white px-4 py-2 text-center font-bold text-sm uppercase tracking-widest">
+                                <i class="fa-solid fa-check-circle mr-1"></i> Asistencia Registrada
+                            </div>
+                            <div class="p-6 flex-1 flex flex-col">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 text-2xl shadow-inner">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-black text-slate-800 leading-tight">Juan Carlos Pérez Salazar</h4>
+                                        <p class="text-sm font-medium text-slate-500">3ro "A" - Secundaria</p>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex-1 flex flex-col justify-center items-center">
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Hora de Ingreso Lector ZKTeco</p>
+                                    <p class="text-3xl font-black text-slate-700">07:30 AM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

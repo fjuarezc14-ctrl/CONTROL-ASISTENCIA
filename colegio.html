@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Teresita - Control de Asistencia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Animaciones suaves */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <div class="flex h-screen overflow-hidden relative">
+        
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="bg-blue-600 text-white p-2.5 rounded-lg shadow-lg">
+                        <i class="fa-solid fa-school text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-wide text-white">ASISTENCIA<span class="text-blue-400"> JUAN XXIII</span></span>
+                </div>
+                
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Vistas del Sistema</p>
+                <nav class="space-y-2 text-sm font-medium">
+                    <button onclick="switchTab('auxiliar')" id="btn-auxiliar" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white transition-all cursor-pointer">
+                        <i class="fa-solid fa-clipboard-user w-5"></i> Panel Auxiliares
+                    </button>
+                    <button onclick="switchTab('padres')" id="btn-padres" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all cursor-pointer">
+                        <i class="fa-solid fa-children w-5"></i> Portal Padres
+                    </button>
+                </nav>
+            </div>
+            <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
+                <p>Demo ZKTeco v1.0</p>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0">
+                <h1 id="page-title" class="text-2xl font-bold text-slate-800">Control de Asistencia - Auxiliares</h1>
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p id="user-name" class="text-sm font-bold text-slate-800">Aux. Carmen Rojas</p>
+                        <p id="user-role" class="text-xs text-slate-400">Turno Mañana</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-6 md:p-8 flex-1">
+
+                <section id="tab-auxiliar" class="tab-content space-y-6 fade-in">
+                    
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4"><i class="fa-solid fa-filter mr-1"></i> Filtros de Búsqueda Rápida</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Nivel</label>
+                                <select id="filtro-nivel" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
+                                    <option value="Todos">Todos los Niveles</option>
+                                    <option value="Secundaria">Secundaria</option>
+                                    <option value="Primaria">Primaria</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Grado</label>
+                                <select id="filtro-grado" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
+                                    <option value="Todos">Todos los Grados</option>
+                                    <option value="1er Grado">1er Grado</option>
+                                    <option value="2do Grado">2do Grado</option>
+                                    <option value="3er Grado">3er Grado</option>
+                                    <option value="4to Grado">4to Grado</option>
+                                    <option value="5to Grado">5to Grado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Sección</label>
+                                <select id="filtro-seccion" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
+                                    <option value="Todas">Todas</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Estado de Hoy</label>
+                                <select id="filtro-estado" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
+                                    <option value="Todos">Todos</option>
+                                    <option value="Falta">Faltaron (No marcaron)</option>
+                                    <option value="Tardanza">Tardanzas</option>
+                                    <option value="Puntual">Puntuales</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse min-w-max">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                                    <th class="p-4 pl-6">Estudiante</th>
+                                    <th class="p-4">Grado y Sección</th>
+                                    <th class="p-4 text-center">Estado (Hoy)</th>
+                                    <th class="p-4 text-center">Hora Marca</th>
+                                    <th class="p-4 text-center">Acciones Rápidas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-alumnos-body" class="divide-y divide-slate-100 text-sm">
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="tab-padres" class="tab-content hidden space-y-6 fade-in">
+                    
+                    <div class="bg-blue-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <h2 class="text-2xl font-bold mb-1">Bienvenido, Familia Gómez Torres</h2>
+                            <p class="text-blue-100 text-sm">Aquí puede monitorear el registro biométrico de ingreso y salida de sus hijos en tiempo real.</p>
+                        </div>
+                        <i class="fa-solid fa-users absolute right-4 -bottom-6 text-8xl text-blue-500 opacity-30"></i>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800">Monitoreo de Hoy (08 de Julio)</h3>
+                    
+                    <div id="contenedor-hijos" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        </div>
+
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-ficha" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 overflow-hidden fade-in">
+            <div class="bg-blue-600 p-6 text-white relative">
+                <button onclick="cerrarModalFicha()" class="absolute top-4 right-4 text-blue-200 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-white text-blue-600 flex items-center justify-center text-2xl font-bold shadow-md">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <h3 id="ficha-nombre" class="text-xl font-bold leading-tight">Nombre del Alumno</h3>
+                        <p id="ficha-grado" class="text-blue-100 text-sm">3er Grado - Sección A (Secundaria)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-5">
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Datos del Apoderado</h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <i class="fa-solid fa-user-tie text-slate-400 w-5 text-center"></i>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase">Nombre Completo</p>
+                                <p id="ficha-apoderado-nombre" class="font-bold text-slate-800 text-sm">Cargando...</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <i class="fa-solid fa-phone text-slate-400 w-5 text-center"></i>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase">Celular</p>
+                                    <p id="ficha-apoderado-tel" class="font-bold text-slate-800 text-sm">Cargando...</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <i class="fa-solid fa-envelope text-slate-400 w-5 text-center"></i>
+                                <div class="overflow-hidden">
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase">Correo</p>
+                                    <p id="ficha-apoderado-correo" class="font-bold text-slate-800 text-sm truncate">Cargando...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <i class="fa-solid fa-location-dot text-slate-400 w-5 text-center"></i>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase">Dirección de Domicilio</p>
+                                <p id="ficha-apoderado-dir" class="font-bold text-slate-800 text-sm">Cargando...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-50 p-4 border-t border-slate-100 flex gap-3">
+                <button id="btn-ficha-wa" onclick="" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Contactar Padre
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BASE DE DATOS SIMULADA (MOCK)
+        const appState = {
+            estudiantes: [
+                { id: 'E001', nombre: 'Carlos Mendoza Ruiz', nivel: 'Secundaria', grado: '3er Grado', seccion: 'A', estado_hoy: 'Puntual', hora_marca: '07:15 AM', apoderado: { nombre: 'Roberto Mendoza', tel: '987654321', correo: 'roberto.m@mail.com', direccion: 'Av. Las Flores 123, Urb. San Carlos' } },
+                { id: 'E002', nombre: 'Lucía Gómez Torres', nivel: 'Secundaria', grado: '3er Grado', seccion: 'A', estado_hoy: 'Falta', hora_marca: '--:-- --', apoderado: { nombre: 'María Torres (Madre)', tel: '999888777', correo: 'maria.torres@mail.com', direccion: 'Calle Los Pinos 456, Centro' }, esHijo: true }, // esHijo: true simula que es del padre logueado
+                { id: 'E003', nombre: 'Mateo Gómez Torres', nivel: 'Primaria', grado: '5to Grado', seccion: 'B', estado_hoy: 'Tardanza', hora_marca: '08:10 AM', apoderado: { nombre: 'María Torres (Madre)', tel: '999888777', correo: 'maria.torres@mail.com', direccion: 'Calle Los Pinos 456, Centro' }, esHijo: true },
+                { id: 'E004', nombre: 'Sofía Castro Díaz', nivel: 'Secundaria', grado: '4to Grado', seccion: 'C', estado_hoy: 'Falta', hora_marca: '--:-- --', apoderado: { nombre: 'Juan Castro', tel: '912345678', correo: 'j.castro@mail.com', direccion: 'Urb. El Bosque Mz F Lt 2' } },
+                { id: 'E005', nombre: 'Diego Ramos Vega', nivel: 'Primaria', grado: '1er Grado', seccion: 'A', estado_hoy: 'Puntual', hora_marca: '07:25 AM', apoderado: { nombre: 'Ana Vega', tel: '955444333', correo: 'ana.v@mail.com', direccion: 'Av. Central 789' } }
+            ]
+        };
+
+        // --- NAVEGACIÓN ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('bg-blue-600', 'text-white'); if(b.id !== `btn-${tabId}`) b.classList.add('text-slate-300', 'hover:bg-slate-800'); });
+            
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.add('bg-blue-600', 'text-white');
+            document.getElementById(`btn-${tabId}`).classList.remove('text-slate-300', 'hover:bg-slate-800');
+            
+            if(tabId === 'auxiliar') {
+                document.getElementById('page-title').innerText = "Control de Asistencia - Auxiliares";
+                document.getElementById('user-name').innerText = "Aux. Carmen Rojas";
+                document.getElementById('user-role').innerText = "Turno Mañana";
+                renderTablaAuxiliar();
+            } else {
+                document.getElementById('page-title').innerText = "Portal de Padres de Familia";
+                document.getElementById('user-name').innerText = "Familia Gómez";
+                document.getElementById('user-role').innerText = "Apoderado";
+                renderPortalPadres();
+            }
+        }
+
+        // --- RENDERIZADO PANEL AUXILIAR ---
+        function renderTablaAuxiliar() {
+            const fNivel = document.getElementById('filtro-nivel').value;
+            const fGrado = document.getElementById('filtro-grado').value;
+            const fSeccion = document.getElementById('filtro-seccion').value;
+            const fEstado = document.getElementById('filtro-estado').value;
+
+            const filtrados = appState.estudiantes.filter(e => {
+                return (fNivel === 'Todos' || e.nivel === fNivel) &&
+                       (fGrado === 'Todos' || e.grado === fGrado) &&
+                       (fSeccion === 'Todas' || e.seccion === fSeccion) &&
+                       (fEstado === 'Todos' || e.estado_hoy === fEstado);
+            });
+
+            const tbody = document.getElementById('tabla-alumnos-body');
+            
+            if(filtrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400">No se encontraron alumnos con esos filtros.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtrados.map(e => {
+                // Colores dinámicos según asistencia
+                let badgeClass = "bg-green-100 text-green-700 border-green-200";
+                let iconClass = "fa-check-circle text-green-500";
+                if(e.estado_hoy === 'Tardanza') { badgeClass = "bg-yellow-100 text-yellow-700 border-yellow-200"; iconClass = "fa-clock text-yellow-500"; }
+                if(e.estado_hoy === 'Falta') { badgeClass = "bg-red-100 text-red-700 border-red-200"; iconClass = "fa-circle-xmark text-red-500"; }
+
+                return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-4 pl-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-400"><i class="fa-solid fa-user"></i></div>
+                            <div>
+                                <p class="font-bold text-slate-800">${e.nombre}</p>
+                                <p class="text-[10px] text-slate-400 font-mono">${e.id}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <p class="font-bold text-slate-700">${e.grado} "${e.seccion}"</p>
+                        <p class="text-[11px] text-slate-500">${e.nivel}</p>
+                    </td>
+                    <td class="p-4 text-center">
+                        <span class="px-2.5 py-1 rounded-md border text-[11px] font-bold uppercase tracking-wide inline-flex items-center gap-1.5 ${badgeClass}">
+                            <i class="fa-solid ${iconClass}"></i> ${e.estado_hoy}
+                        </span>
+                    </td>
+                    <td class="p-4 text-center font-mono text-xs font-bold text-slate-500">${e.hora_marca}</td>
+                    <td class="p-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="abrirModalFicha('${e.id}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center" title="Ver Ficha Alumno">
+                                <i class="fa-solid fa-address-card"></i>
+                            </button>
+                            <button onclick="enviarWhatsApp('${e.apoderado.tel}', '${e.nombre}', '${e.estado_hoy}')" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-500 hover:text-white transition-colors flex items-center justify-center" title="Aviso a Apoderado por WhatsApp">
+                                <i class="fa-brands fa-whatsapp text-lg"></i>
+                            </button>
+                            <button onclick="notificarInterno('${e.nombre}')" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-700 hover:text-white transition-colors flex items-center justify-center" title="Enviar Mensaje al Portal Padres">
+                                <i class="fa-solid fa-bell"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // --- ACCIONES AUXILIARES ---
+        function abrirModalFicha(id) {
+            const e = appState.estudiantes.find(x => x.id === id);
+            document.getElementById('ficha-nombre').innerText = e.nombre;
+            document.getElementById('ficha-grado').innerText = `${e.grado} - Sección ${e.seccion} (${e.nivel})`;
+            document.getElementById('ficha-apoderado-nombre').innerText = e.apoderado.nombre;
+            document.getElementById('ficha-apoderado-tel').innerText = e.apoderado.tel;
+            document.getElementById('ficha-apoderado-correo').innerText = e.apoderado.correo;
+            document.getElementById('ficha-apoderado-dir').innerText = e.apoderado.direccion;
+            
+            const btnWa = document.getElementById('btn-ficha-wa');
+            btnWa.onclick = () => enviarWhatsApp(e.apoderado.tel, e.nombre, e.estado_hoy);
+
+            document.getElementById('modal-ficha').classList.remove('hidden');
+        }
+        function cerrarModalFicha() { document.getElementById('modal-ficha').classList.add('hidden'); }
+
+        function enviarWhatsApp(telefono, alumnoNombre, estado) {
+            let mensaje = "";
+            if(estado === 'Falta') {
+                mensaje = `🔴 URGENTE: Estimado padre de familia, le informamos que el día de hoy el alumno *${alumnoNombre}* NO REGISTRA ingreso en el lector biométrico de la institución. Por favor comunicarse con nosotros.`;
+            } else if (estado === 'Tardanza') {
+                mensaje = `🟡 AVISO: Estimado padre de familia, le informamos que el alumno *${alumnoNombre}* ha registrado su ingreso con TARDANZA.`;
+            } else {
+                mensaje = `🟢 Estimado padre de familia, nos comunicamos desde la institución educativa para informarle sobre su menor hijo(a) *${alumnoNombre}*...`;
+            }
+            // Abrir link de WhatsApp Web / App
+            const url = `https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        }
+
+        function notificarInterno(alumnoNombre) {
+            alert(`Mensaje enviado al portal del apoderado de ${alumnoNombre} con éxito.`);
+        }
+
+        // --- RENDERIZADO PORTAL PADRES ---
+        function renderPortalPadres() {
+            // Simulamos que el padre logueado ve solo a sus hijos (los que tienen esHijo: true)
+            const hijos = appState.estudiantes.filter(e => e.esHijo === true);
+            const container = document.getElementById('contenedor-hijos');
+
+            container.innerHTML = hijos.map(e => {
+                
+                // UI Dinámica según estado
+                let cardColor = "bg-white border-slate-200";
+                let statusHeader = "";
+                
+                if(e.estado_hoy === 'Puntual') {
+                    cardColor = "bg-white border-green-200";
+                    statusHeader = `<div class="bg-green-500 text-white px-4 py-2 text-center font-bold text-sm uppercase tracking-widest"><i class="fa-solid fa-check-circle mr-1"></i> Asistencia Puntual Registrada</div>`;
+                } else if(e.estado_hoy === 'Tardanza') {
+                    cardColor = "bg-white border-yellow-300";
+                    statusHeader = `<div class="bg-yellow-400 text-yellow-900 px-4 py-2 text-center font-bold text-sm uppercase tracking-widest"><i class="fa-solid fa-clock mr-1"></i> Ingresó con Tardanza</div>`;
+                } else {
+                    cardColor = "bg-red-50 border-red-200";
+                    statusHeader = `<div class="bg-red-500 text-white px-4 py-2 text-center font-bold text-sm uppercase tracking-widest"><i class="fa-solid fa-triangle-exclamation mr-1"></i> No registra ingreso hoy</div>`;
+                }
+
+                return `
+                <div class="${cardColor} rounded-2xl border shadow-md overflow-hidden flex flex-col">
+                    ${statusHeader}
+                    <div class="p-6 flex-1 flex flex-col">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 text-2xl shadow-inner">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-black text-slate-800 leading-tight">${e.nombre}</h4>
+                                <p class="text-sm font-medium text-slate-500">${e.grado} "${e.seccion}" - ${e.nivel}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex-1 flex flex-col justify-center items-center">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Hora de Ingreso Lector ZKTeco</p>
+                            <p class="text-3xl font-black ${e.estado_hoy === 'Falta' ? 'text-red-500' : 'text-slate-700'}">${e.hora_marca}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // INICIALIZACIÓN
+        switchTab('auxiliar'); // Arranca mostrando la vista del Auxiliar
+    </script>
+</body>
+</html>
