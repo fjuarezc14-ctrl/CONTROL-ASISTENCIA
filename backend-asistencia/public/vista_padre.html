@@ -258,8 +258,10 @@
         }
 
         function cerrarSesion() {
-            sessionStorage.clear();
-            window.location.href = 'index.html';
+            if (confirm('¿Desea cerrar sesión en el portal de apoderados?')) {
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
         }
 
         cargarHijos();

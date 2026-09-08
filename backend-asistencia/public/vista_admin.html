@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ASISTENCIA VT - Panel de Administración & Control Biométrico</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -11,25 +11,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .fade-in { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Ocultar barra de scroll pero mantener funcionalidad */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
         @media print {
-            aside, header, .no-print { display: none !important; }
-            main { padding: 0 !important; }
-            table { width: 100% !important; font-size: 10px !important; }
+            aside, header, #toolbar-filtros, .no-print { display: none !important; }
+            main { padding: 0 !important; width: 100% !important; }
+            body { background: white !important; }
+            .tabla-impresion { display: block !important; width: 100% !important; }
+            .cards-movil { display: none !important; }
         }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col lg:flex-row relative selection:bg-blue-600 selection:text-white">
 
-    <div class="flex h-screen overflow-hidden relative">
+    <!-- Overlay para Menú Móvil -->
+    <div id="sidebar-overlay" onclick="toggleSidebar(false)" 
+        class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+    <!-- Sidebar Corporativo VALETEC (Desktop Fijo + Móvil Deslizable) -->
+    <aside id="sidebar-menu" 
+        class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 text-slate-300 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 border-r border-slate-800/80">
         
-        <!-- Sidebar Corporativo VALETEC -->
-        <aside class="w-64 bg-slate-950 text-slate-300 flex flex-col justify-between shrink-0 shadow-2xl z-20 border-r border-slate-800/80">
-            <div class="p-5">
-                <!-- Logotipo e Identidad -->
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-lg shadow-lg shadow-blue-500/25">
+        <div class="p-5 flex-1 overflow-y-auto no-scrollbar">
+            <!-- Encabezado del Menú con botón cerrar en móvil -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-lg shadow-lg shadow-blue-500/25 shrink-0">
                         <i class="fa-solid fa-fingerprint"></i>
                     </div>
                     <div>
@@ -40,300 +52,326 @@
                         <p class="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">by VT VALETEC</p>
                     </div>
                 </div>
-                
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-2">Gestión Institucional</p>
-                <nav class="space-y-1.5 text-xs font-semibold">
-                    <a href="vista_admin.html" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition-all">
-                        <i class="fa-solid fa-gauge-high w-4 text-center"></i> Panel de Control
-                    </a>
-                    <a href="vista_padre.html" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
-                        <i class="fa-solid fa-users w-4 text-center"></i> Portal de Apoderados
-                    </a>
-                </nav>
 
-                <div class="mt-8 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800/80 text-[11px]">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                        <i class="fa-solid fa-microchip text-blue-400"></i> Terminal Facial
-                    </p>
-                    <p class="text-slate-200 font-semibold truncate">ZKTeco FacePro ADMS</p>
-                    <div class="flex items-center gap-1.5 text-[10px] text-emerald-400 mt-1 font-medium">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                        En línea &bull; Sincronizado
-                    </div>
-                </div>
+                <!-- Botón Cerrar en Móvil -->
+                <button onclick="toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-900">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             
-            <div class="p-5 border-t border-slate-800/80 text-xs">
-                <div class="flex items-center justify-between">
-                    <div class="overflow-hidden">
-                        <p class="text-white font-bold text-xs truncate" id="sidebar-user">Administrador General</p>
-                        <p class="text-[10px] text-blue-400 font-medium">Rol: Administrador</p>
-                    </div>
-                    <button onclick="cerrarSesion()" title="Cerrar Sesión" class="text-slate-400 hover:text-rose-400 transition p-2 rounded-xl hover:bg-slate-900 cursor-pointer">
-                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
-                    </button>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-2">Gestión Institucional</p>
+            <nav class="space-y-1.5 text-xs font-semibold">
+                <a href="vista_admin.html" onclick="toggleSidebar(false)" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition-all">
+                    <i class="fa-solid fa-gauge-high w-4 text-center"></i> Panel de Control
+                </a>
+                <a href="vista_padre.html" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+                    <i class="fa-solid fa-users w-4 text-center"></i> Portal de Apoderados
+                </a>
+            </nav>
+
+            <!-- Card de Estado de Conexión Facial -->
+            <div class="mt-6 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800/80 text-[11px]">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-microchip text-blue-400"></i> Terminal Facial
+                </p>
+                <p class="text-slate-200 font-semibold truncate">ZKTeco FacePro ADMS</p>
+                <div class="flex items-center gap-1.5 text-[10px] text-emerald-400 mt-1 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                    En línea &bull; Puerto 3060
                 </div>
             </div>
-        </aside>
+        </div>
+        
+        <!-- Perfil y Cierre de Sesión Seguro -->
+        <div class="p-4 border-t border-slate-800/80 text-xs bg-slate-950/50">
+            <div class="flex items-center justify-between">
+                <div class="overflow-hidden pr-2">
+                    <p class="text-white font-bold text-xs truncate" id="sidebar-user">Administrador General</p>
+                    <p class="text-[10px] text-blue-400 font-medium truncate">Rol: Administrador</p>
+                </div>
+                <!-- Botón de logout con confirmación obligatoria para evitar clics accidentales -->
+                <button type="button" onclick="confirmarCerrarSesion()" title="Cerrar Sesión" 
+                    class="text-slate-400 hover:text-rose-400 transition p-2.5 rounded-xl hover:bg-slate-900 cursor-pointer shrink-0 border border-slate-800/60">
+                    <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
 
-        <!-- Contenido Principal -->
-        <main class="flex-1 flex flex-col overflow-y-auto bg-slate-100">
+    <!-- Contenedor Principal Adaptable -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-screen lg:h-screen lg:overflow-y-auto">
+        
+        <!-- Barra Superior / Header (Móvil y Desktop) -->
+        <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3 shrink-0 shadow-sm sticky top-0 z-20">
             
-            <!-- Barra Superior / Header -->
-            <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-4 shrink-0 shadow-sm sticky top-0 z-10">
+            <div class="flex items-center gap-3">
+                <!-- Botón Hamburguesa en Móvil -->
+                <button onclick="toggleSidebar(true)" class="lg:hidden p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 border border-slate-200 focus:outline-none">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Panel de Control de Asistencia</h1>
-                        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider">Enterprise</span>
+                        <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight">Control de Asistencia</h1>
+                        <span class="hidden sm:inline-block px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider">Enterprise</span>
                     </div>
-                    <p class="text-xs text-slate-500 font-medium">Monitoreo biométrico de alumnos, búsqueda integral por DNI y gestión de avisos</p>
+                    <p class="text-[11px] text-slate-500 font-medium hidden sm:block">Monitoreo biométrico facial y gestión institucional</p>
                 </div>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Reloj Digital en Vivo -->
+                <div class="hidden md:flex items-center gap-2 bg-slate-900 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-mono font-bold shadow-sm">
+                    <i class="fa-regular fa-clock text-blue-400"></i>
+                    <span id="reloj-vivo">--:--:--</span>
+                </div>
+
+                <!-- Selector de fecha -->
+                <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs">
+                    <i class="fa-regular fa-calendar text-blue-600 text-xs"></i>
+                    <input type="date" id="filtro-fecha" onchange="cargarAsistencias()" class="bg-transparent font-bold text-slate-700 outline-none cursor-pointer text-xs w-28 sm:w-auto">
+                </div>
+
+                <button onclick="irAHoy()" class="hidden sm:inline-block px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+                    Hoy
+                </button>
+
+                <button onclick="cargarAsistencias()" class="bg-blue-600 hover:bg-blue-700 text-white p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span class="hidden sm:inline">Actualizar</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Cuerpo del Dashboard -->
+        <main class="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6 flex-1 min-w-0">
+            
+            <!-- Tarjetas KPI de Estadísticas en Vivo (2 col en móvil, 3 en tablet, 6 en desktop) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 
-                <div class="flex items-center gap-3">
-                    <!-- Reloj en vivo -->
-                    <div class="hidden sm:flex items-center gap-2 bg-slate-900 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-mono font-bold shadow-sm">
-                        <i class="fa-regular fa-clock text-blue-400"></i>
-                        <span id="reloj-vivo">--:--:--</span>
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base font-bold shrink-0">
+                        <i class="fa-solid fa-user-group"></i>
                     </div>
-
-                    <!-- Selector de fecha -->
-                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
-                        <i class="fa-regular fa-calendar text-blue-600"></i>
-                        <input type="date" id="filtro-fecha" onchange="cargarAsistencias()" class="bg-transparent font-bold text-slate-700 outline-none cursor-pointer">
-                    </div>
-
-                    <button onclick="irAHoy()" class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
-                        Hoy
-                    </button>
-
-                    <button onclick="cargarAsistencias()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer">
-                        <i class="fa-solid fa-arrows-rotate"></i> Actualizar
-                    </button>
-                </div>
-            </header>
-
-            <div class="p-6 md:p-8 space-y-6 flex-1">
-                
-                <!-- Tarjetas KPI de Estadísticas en Vivo -->
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-                    
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold shrink-0">
-                            <i class="fa-solid fa-user-group"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registrados</p>
-                            <h3 id="kpi-total" class="text-2xl font-black text-slate-900">0</h3>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold shrink-0">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Puntuales</p>
-                            <h3 id="kpi-puntuales" class="text-2xl font-black text-slate-900">0</h3>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Tardanzas</p>
-                            <h3 id="kpi-tardanzas" class="text-2xl font-black text-slate-900">0</h3>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg font-bold shrink-0">
-                            <i class="fa-solid fa-circle-xmark"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Inasistencias</p>
-                            <h3 id="kpi-faltas" class="text-2xl font-black text-slate-900">0</h3>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold shrink-0">
-                            <i class="fa-solid fa-file-medical"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Justificadas</p>
-                            <h3 id="kpi-justificadas" class="text-2xl font-black text-slate-900">0</h3>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5 col-span-2 md:col-span-1">
-                        <div class="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center text-lg font-bold shrink-0">
-                            <i class="fa-solid fa-chart-pie text-blue-400"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Asistencia</p>
-                            <h3 id="kpi-tasa" class="text-2xl font-black text-slate-900">0%</h3>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Barra de Búsqueda Avanzada y Filtros de Administrador -->
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
-                        
-                        <!-- Búsqueda Universal por DNI, Código o Nombre -->
-                        <div class="w-full lg:w-96 relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                                <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                            </span>
-                            <input type="text" id="busqueda-texto" oninput="filtrarTabla()" placeholder="Buscar por DNI, Código, Nombre o Apellido..." 
-                                class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-slate-50/50 placeholder:text-slate-400">
-                            <button onclick="limpiarBusqueda()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                                <i class="fa-solid fa-xmark text-xs"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Filtros desplegables combinados -->
-                        <div class="flex flex-wrap gap-2.5 items-center">
-                            
-                            <select id="filtro-nivel" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
-                                <option value="Todos">Nivel / Ciclo: Todos</option>
-                                <option value="Secundaria">Secundaria</option>
-                                <option value="Primaria">Primaria</option>
-                                <option value="Pre-Universitario">Pre-Universitario</option>
-                            </select>
-
-                            <select id="filtro-grado" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
-                                <option value="Todos">Grupo / Aula: Todos</option>
-                                <option value="3er Grado">3er Grado / Aula 301</option>
-                                <option value="5to Grado">5to Grado / Aula 204</option>
-                                <option value="1er Grado">1er Grado / Aula 102</option>
-                                <option value="Ciclo Intensivo">Ciclo Intensivo</option>
-                            </select>
-
-                            <select id="filtro-estado" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
-                                <option value="Todos">Estado: Todos</option>
-                                <option value="Puntual">Puntuales</option>
-                                <option value="Tardanza">Tardanzas</option>
-                                <option value="Falta">Inasistencias</option>
-                                <option value="Justificada">Justificadas</option>
-                            </select>
-
-                            <!-- Botones de Acción / Exportación -->
-                            <div class="flex items-center gap-1.5 ml-auto no-print">
-                                <button onclick="exportarExcel()" title="Exportar reporte CSV/Excel" class="px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-                                    <i class="fa-solid fa-file-excel"></i> Excel
-                                </button>
-                                <button onclick="window.print()" title="Imprimir listado" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-                                    <i class="fa-solid fa-print"></i> Imprimir
-                                </button>
-                            </div>
-
-                        </div>
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Total Alumnos</p>
+                        <h3 id="kpi-total" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">0</h3>
                     </div>
                 </div>
 
-                <!-- Tabla de Datos Integral del Administrador -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[850px]">
-                            <thead>
-                                <tr class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
-                                    <th class="p-4 pl-6">Estudiante / Alumno</th>
-                                    <th class="p-4">DNI & Código</th>
-                                    <th class="p-4">Nivel / Aula / Grupo</th>
-                                    <th class="p-4 text-center">Estado de Asistencia</th>
-                                    <th class="p-4 text-center">Entrada (ZKTeco)</th>
-                                    <th class="p-4 text-center">Salida</th>
-                                    <th class="p-4">Apoderado / Contacto</th>
-                                    <th class="p-4 text-center no-print">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-body" class="divide-y divide-slate-100 text-xs">
-                                <tr>
-                                    <td colspan="8" class="p-10 text-center text-slate-400">
-                                        <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600 mb-2"></i>
-                                        <p class="font-medium">Cargando base de datos de asistencia...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base font-bold shrink-0">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-emerald-600 uppercase tracking-wider truncate">Puntuales</p>
+                        <h3 id="kpi-puntuales" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base font-bold shrink-0">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-amber-600 uppercase tracking-wider truncate">Tardanzas</p>
+                        <h3 id="kpi-tardanzas" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base font-bold shrink-0">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-rose-600 uppercase tracking-wider truncate">Inasistencias</p>
+                        <h3 id="kpi-faltas" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-indigo-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base font-bold shrink-0">
+                        <i class="fa-solid fa-file-medical"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-indigo-600 uppercase tracking-wider truncate">Justificadas</p>
+                        <h3 id="kpi-justificadas" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 col-span-2 sm:col-span-1">
+                    <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center text-base font-bold shrink-0">
+                        <i class="fa-solid fa-chart-pie text-blue-400"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">% Asistencia</p>
+                        <h3 id="kpi-tasa" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">0%</h3>
                     </div>
                 </div>
 
             </div>
+
+            <!-- Barra de Búsqueda y Filtros Adaptable -->
+            <div id="toolbar-filtros" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3.5">
+                
+                <!-- Búsqueda Universal por DNI, Código o Nombre -->
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="text" id="busqueda-texto" oninput="filtrarTabla()" placeholder="Buscar por DNI, Código, Nombre o Apellido..." 
+                        class="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-slate-50/60 placeholder:text-slate-400">
+                    <button onclick="limpiarBusqueda()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                </div>
+                
+                <!-- Filtros Dropdowns y Botones de Exportación -->
+                <div class="flex flex-wrap items-center justify-between gap-2.5">
+                    
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <select id="filtro-nivel" onchange="filtrarTabla()" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                            <option value="Todos">Nivel: Todos</option>
+                            <option value="Secundaria">Secundaria</option>
+                            <option value="Primaria">Primaria</option>
+                            <option value="Pre-Universitario">Pre-Universitario</option>
+                        </select>
+
+                        <select id="filtro-grado" onchange="filtrarTabla()" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                            <option value="Todos">Grupo / Aula: Todos</option>
+                            <option value="3er Grado">3er Grado</option>
+                            <option value="5to Grado">5to Grado</option>
+                            <option value="1er Grado">1er Grado</option>
+                            <option value="Ciclo Intensivo">Ciclo Intensivo</option>
+                        </select>
+
+                        <select id="filtro-estado" onchange="filtrarTabla()" class="w-full sm:w-auto px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                            <option value="Todos">Estado: Todos</option>
+                            <option value="Puntual">Puntuales</option>
+                            <option value="Tardanza">Tardanzas</option>
+                            <option value="Falta">Inasistencias</option>
+                            <option value="Justificada">Justificadas</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end no-print pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                        <button onclick="exportarExcel()" class="flex-1 sm:flex-initial px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                        </button>
+                        <button onclick="window.print()" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-print"></i> Imprimir
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VISTA 1: TARJETAS RESPONSIVE PARA MÓVILES (Visible en < lg) -->
+            <div id="contenedor-cards-movil" class="block lg:hidden space-y-3 cards-movil">
+                <div class="p-8 text-center text-slate-400 bg-white rounded-2xl border border-slate-200">
+                    <i class="fa-solid fa-circle-notch fa-spin text-xl text-blue-600 mb-2"></i>
+                    <p class="text-xs">Cargando registros...</p>
+                </div>
+            </div>
+
+            <!-- VISTA 2: TABLA COMPLETA PARA ESCRITORIO (Visible en >= lg y en Impresión) -->
+            <div class="hidden lg:block bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden tabla-impresion">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[850px]">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-4 pl-6">Estudiante / Alumno</th>
+                                <th class="p-4">DNI & Código</th>
+                                <th class="p-4">Nivel / Aula / Grupo</th>
+                                <th class="p-4 text-center">Estado</th>
+                                <th class="p-4 text-center">Entrada (ZKTeco)</th>
+                                <th class="p-4 text-center">Salida</th>
+                                <th class="p-4">Apoderado / Contacto</th>
+                                <th class="p-4 text-center no-print">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-body" class="divide-y divide-slate-100 text-xs">
+                            <tr>
+                                <td colspan="8" class="p-10 text-center text-slate-400 font-medium">
+                                    <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600 mb-2"></i>
+                                    <p>Cargando registros biométricos...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </main>
     </div>
 
     <!-- MODAL 1: FICHA INTEGRAL DEL ALUMNO Y APODERADO -->
-    <div id="modal-ficha" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden fade-in">
-            <div class="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 p-6 text-white relative">
-                <button onclick="cerrarModal('modal-ficha')" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer text-lg">
+    <div id="modal-ficha" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 p-5 sm:p-6 text-white relative shrink-0">
+                <button onclick="cerrarModal('modal-ficha')" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer text-lg p-1">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-2xl bg-blue-600/30 border border-blue-400/30 text-white flex items-center justify-center text-2xl font-bold shadow-inner">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/30 text-white flex items-center justify-center text-2xl font-bold shadow-inner shrink-0">
                         <i class="fa-solid fa-user-graduate"></i>
                     </div>
-                    <div>
+                    <div class="overflow-hidden">
                         <div class="inline-block px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-[10px] font-bold uppercase tracking-wider mb-1">
                             Ficha Institucional
                         </div>
-                        <h3 id="ficha-nombre" class="text-xl font-black leading-tight">Cargando...</h3>
-                        <p id="ficha-grado" class="text-slate-300 text-xs mt-0.5">Grupo y Nivel</p>
+                        <h3 id="ficha-nombre" class="text-lg sm:text-xl font-black leading-tight truncate">Cargando...</h3>
+                        <p id="ficha-grado" class="text-slate-300 text-xs mt-0.5 truncate">Grupo y Nivel</p>
                     </div>
                 </div>
             </div>
             
-            <div class="p-6 space-y-4 text-xs">
-                <!-- Identificadores del estudiante -->
+            <div class="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1">
+                <!-- Identificadores -->
                 <div class="grid grid-cols-3 gap-2 text-center">
                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">DNI Alumno</p>
-                        <p id="ficha-dni" class="font-black text-slate-800 text-sm mt-0.5">-</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">DNI Alumno</p>
+                        <p id="ficha-dni" class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">-</p>
                     </div>
                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Código Inst.</p>
-                        <p id="ficha-codigo" class="font-black text-slate-800 text-sm mt-0.5">-</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Código</p>
+                        <p id="ficha-codigo" class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">-</p>
                     </div>
                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">PIN ZKTeco</p>
-                        <p id="ficha-pin" class="font-black text-blue-600 text-sm mt-0.5">-</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">PIN ZKTeco</p>
+                        <p id="ficha-pin" class="font-black text-blue-600 text-xs sm:text-sm mt-0.5">-</p>
                     </div>
                 </div>
 
-                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 pt-2">
-                    <i class="fa-solid fa-user-shield mr-1 text-blue-600"></i> Datos del Apoderado / Contacto de Emergencia
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-1.5 pt-1">
+                    <i class="fa-solid fa-user-shield mr-1 text-blue-600"></i> Apoderado / Contacto
                 </h4>
                 
                 <div class="space-y-2.5">
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Nombre Completo</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Nombre Completo</p>
                         <p id="ficha-apoderado-nombre" class="font-bold text-slate-800 text-xs mt-0.5">-</p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Teléfono Móvil</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Teléfono Móvil</p>
                             <p id="ficha-apoderado-tel" class="font-bold text-slate-800 text-xs mt-0.5">-</p>
                         </div>
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 overflow-hidden">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Correo Electrónico</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Correo Electrónico</p>
                             <p id="ficha-apoderado-correo" class="font-bold text-slate-800 text-xs mt-0.5 truncate">-</p>
                         </div>
                     </div>
 
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Dirección Domiciliaria</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Dirección Domiciliaria</p>
                         <p id="ficha-apoderado-dir" class="font-bold text-slate-800 text-xs mt-0.5">-</p>
                     </div>
                 </div>
             </div>
 
-            <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2.5">
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2 shrink-0">
                 <button id="btn-ficha-wa" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs shadow-md shadow-emerald-600/20 cursor-pointer">
                     <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp Apoderado
                 </button>
@@ -342,21 +380,21 @@
     </div>
 
     <!-- MODAL 2: JUSTIFICAR INASISTENCIA O PERMISO -->
-    <div id="modal-justificar" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="modal-justificar" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden fade-in">
             <div class="bg-gradient-to-r from-indigo-700 to-blue-700 p-5 text-white flex justify-between items-center">
                 <h3 class="font-bold text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-file-signature"></i> Justificar Asistencia Institucional
+                    <i class="fa-solid fa-file-signature"></i> Justificar Asistencia
                 </h3>
                 <button onclick="cerrarModal('modal-justificar')" class="text-white/80 hover:text-white cursor-pointer">
                     <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
-            <form onsubmit="guardarJustificacion(event)" class="p-6 space-y-4">
+            <form onsubmit="guardarJustificacion(event)" class="p-5 sm:p-6 space-y-4">
                 <input type="hidden" id="justificar-estudiante-id">
                 <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Alumno / Estudiante</p>
-                    <p id="justificar-alumno-nombre" class="text-sm font-black text-slate-800 mt-1">-</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Estudiante</p>
+                    <p id="justificar-alumno-nombre" class="text-sm font-black text-slate-800 mt-0.5">-</p>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Motivo Oficial</label>
@@ -371,17 +409,17 @@
     </div>
 
     <!-- MODAL 3: MARCACIÓN MANUAL ADMINISTRATIVA -->
-    <div id="modal-manual" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="modal-manual" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden fade-in">
             <div class="bg-gradient-to-r from-slate-900 to-blue-900 p-5 text-white flex justify-between items-center">
                 <h3 class="font-bold text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square"></i> Marcación Manual Administrativa
+                    <i class="fa-solid fa-pen-to-square"></i> Marcación Manual
                 </h3>
                 <button onclick="cerrarModal('modal-manual')" class="text-white/80 hover:text-white cursor-pointer">
                     <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
-            <form onsubmit="guardarMarcacionManual(event)" class="p-6 space-y-4 text-xs">
+            <form onsubmit="guardarMarcacionManual(event)" class="p-5 sm:p-6 space-y-4 text-xs">
                 <input type="hidden" id="manual-estudiante-id">
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase">Estudiante</p>
@@ -406,15 +444,50 @@
         </div>
     </div>
 
+    <!-- MODAL 4: DIÁLOGO DE CONFIRMACIÓN DE CIERRE DE SESIÓN -->
+    <div id="modal-confirmar-salir" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6 text-center space-y-4 fade-in">
+            <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mx-auto border border-rose-100">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-black text-slate-900">¿Deseas cerrar sesión?</h3>
+                <p class="text-xs text-slate-500 mt-1">Saldrás del panel de administración institucional.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5 pt-2">
+                <button onclick="cerrarModal('modal-confirmar-salir')" class="py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                    Cancelar
+                </button>
+                <button onclick="ejecutarCerrarSesion()" class="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-md shadow-rose-600/20 cursor-pointer">
+                    Sí, salir
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let estudiantesData = [];
         const hoy = new Date().toISOString().split('T')[0];
         document.getElementById('filtro-fecha').value = hoy;
 
+        // Toggle Sidebar en Móvil
+        function toggleSidebar(abrir) {
+            const sidebar = document.getElementById('sidebar-menu');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (abrir) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
         // Reloj en tiempo real
         function actualizarReloj() {
             const ahora = new Date();
-            document.getElementById('reloj-vivo').innerText = ahora.toLocaleTimeString('es-PE', { hour12: false });
+            const reloj = document.getElementById('reloj-vivo');
+            if (reloj) reloj.innerText = ahora.toLocaleTimeString('es-PE', { hour12: false });
         }
         setInterval(actualizarReloj, 1000);
         actualizarReloj();
@@ -424,10 +497,11 @@
             cargarAsistencias();
         }
 
-        // Sesión
+        // Datos del Usuario
         const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario_activo') || '{}');
         if (usuarioSesion.nombre) {
-            document.getElementById('sidebar-user').innerText = usuarioSesion.nombre;
+            const el = document.getElementById('sidebar-user');
+            if (el) el.innerText = usuarioSesion.nombre;
         }
 
         async function cargarAsistencias() {
@@ -481,30 +555,20 @@
                 return matchTexto && matchNivel && matchGrado && matchEstado;
             });
 
-            renderTabla(filtrados);
+            renderTablaDesktop(filtrados);
+            renderCardsMovil(filtrados);
         }
 
-        function renderTabla(lista) {
+        // Render para Escritorio (Tabla)
+        function renderTablaDesktop(lista) {
             const tbody = document.getElementById('tabla-body');
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-slate-400 font-medium">No se encontraron estudiantes con los criterios de búsqueda.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-slate-400 font-medium">No se encontraron estudiantes con los filtros aplicados.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = lista.map(e => {
-                let badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
-                let iconClass = "fa-circle-check text-emerald-500";
-
-                if (e.estado_hoy === 'Tardanza' || e.estado_hoy === 'Tardanza Grave') {
-                    badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
-                    iconClass = "fa-clock text-amber-500";
-                } else if (e.estado_hoy === 'Falta') {
-                    badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
-                    iconClass = "fa-circle-xmark text-rose-500";
-                } else if (e.estado_hoy === 'Justificada') {
-                    badgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
-                    iconClass = "fa-file-medical text-indigo-500";
-                }
+                const { badgeClass, iconClass } = obtenerEstilosEstado(e.estado_hoy);
 
                 return `
                 <tr class="hover:bg-slate-50/80 transition-colors">
@@ -513,8 +577,8 @@
                             <div class="w-9 h-9 rounded-xl bg-slate-200/80 text-slate-600 flex items-center justify-center font-black text-xs shrink-0 border border-slate-300/60">
                                 ${e.nombre ? e.nombre.charAt(0) : 'E'}
                             </div>
-                            <div>
-                                <p class="font-bold text-slate-900">${e.nombre}</p>
+                            <div class="overflow-hidden">
+                                <p class="font-bold text-slate-900 truncate">${e.nombre}</p>
                                 <p class="text-[10px] text-slate-400 font-medium">PIN: ${e.pin_biometrico || '-'}</p>
                             </div>
                         </div>
@@ -539,20 +603,20 @@
                         ${e.hora_salida || '--:-- --'}
                     </td>
                     <td class="p-3.5">
-                        <p class="font-semibold text-slate-800 text-[11px] truncate max-w-[150px]">${e.apoderado?.nombre || 'No asignado'}</p>
+                        <p class="font-semibold text-slate-800 text-[11px] truncate max-w-[140px]">${e.apoderado?.nombre || 'No asignado'}</p>
                         <p class="text-[10px] text-slate-400 flex items-center gap-1">
                             <i class="fa-solid fa-phone text-[9px]"></i> ${e.apoderado?.tel || '-'}
                         </p>
                     </td>
                     <td class="p-3.5 no-print">
                         <div class="flex items-center justify-center gap-1.5">
-                            <button onclick="abrirFicha(${e.id})" title="Ficha Completa del Alumno" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 transition flex items-center justify-center cursor-pointer">
+                            <button onclick="abrirFicha(${e.id})" title="Ficha Integral" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 transition flex items-center justify-center cursor-pointer">
                                 <i class="fa-solid fa-address-card text-xs"></i>
                             </button>
-                            <button onclick="abrirWhatsApp('${e.apoderado?.tel || ''}', '${e.nombre}', '${e.estado_hoy}')" title="Aviso Institucional WhatsApp" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition flex items-center justify-center cursor-pointer">
+                            <button onclick="abrirWhatsApp('${e.apoderado?.tel || ''}', '${e.nombre}', '${e.estado_hoy}')" title="WhatsApp" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition flex items-center justify-center cursor-pointer">
                                 <i class="fa-brands fa-whatsapp text-sm"></i>
                             </button>
-                            <button onclick="abrirModalJustificar(${e.id}, '${e.nombre}')" title="Justificar Inasistencia" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 transition flex items-center justify-center cursor-pointer">
+                            <button onclick="abrirModalJustificar(${e.id}, '${e.nombre}')" title="Justificar" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 transition flex items-center justify-center cursor-pointer">
                                 <i class="fa-solid fa-file-signature text-xs"></i>
                             </button>
                             <button onclick="abrirModalManual(${e.id}, '${e.nombre}')" title="Marcación Manual" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-200 transition flex items-center justify-center cursor-pointer">
@@ -563,6 +627,93 @@
                 </tr>
                 `;
             }).join('');
+        }
+
+        // Render para Móviles (Tarjetas individuales táctiles)
+        function renderCardsMovil(lista) {
+            const container = document.getElementById('contenedor-cards-movil');
+            if (lista.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-400 bg-white rounded-2xl border border-slate-200 text-xs">No se encontraron estudiantes con los filtros aplicados.</div>`;
+                return;
+            }
+
+            container.innerHTML = lista.map(e => {
+                const { badgeClass, iconClass } = obtenerEstilosEstado(e.estado_hoy);
+
+                return `
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3 fade-in">
+                    
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm shrink-0 border border-blue-100">
+                                ${e.nombre ? e.nombre.charAt(0) : 'E'}
+                            </div>
+                            <div class="overflow-hidden">
+                                <h4 class="font-bold text-slate-900 text-sm truncate">${e.nombre}</h4>
+                                <div class="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                                    <span>DNI: ${e.dni || 'Sin DNI'}</span>
+                                    <span>&bull; ${e.codigo_estudiante || ''}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <span class="px-2.5 py-1 rounded-lg border text-[10px] font-bold tracking-wide inline-flex items-center gap-1 shrink-0 ${badgeClass}">
+                            <i class="fa-solid ${iconClass}"></i> ${e.estado_hoy}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-xl text-xs border border-slate-100">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Entrada Facial</p>
+                            <p class="font-mono font-bold text-slate-800 text-xs mt-0.5">${e.hora_marca}</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Grupo / Aula</p>
+                            <p class="font-semibold text-slate-700 text-xs mt-0.5 truncate">${e.grado} "${e.seccion}"</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+                        <span class="text-[11px] truncate max-w-[170px]">
+                            <i class="fa-solid fa-user-shield text-[10px] text-slate-400 mr-1"></i> ${e.apoderado?.nombre || 'Sin apoderado'}
+                        </span>
+
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="abrirFicha(${e.id})" title="Ficha" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center">
+                                <i class="fa-solid fa-address-card text-xs"></i>
+                            </button>
+                            <button onclick="abrirWhatsApp('${e.apoderado?.tel || ''}', '${e.nombre}', '${e.estado_hoy}')" title="WhatsApp" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                            </button>
+                            <button onclick="abrirModalJustificar(${e.id}, '${e.nombre}')" title="Justificar" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200 flex items-center justify-center">
+                                <i class="fa-solid fa-file-signature text-xs"></i>
+                            </button>
+                            <button onclick="abrirModalManual(${e.id}, '${e.nombre}')" title="Manual" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-center">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                `;
+            }).join('');
+        }
+
+        function obtenerEstilosEstado(estado) {
+            let badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+            let iconClass = "fa-circle-check text-emerald-500";
+
+            if (estado === 'Tardanza' || estado === 'Tardanza Grave') {
+                badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                iconClass = "fa-clock text-amber-500";
+            } else if (estado === 'Falta') {
+                badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
+                iconClass = "fa-circle-xmark text-rose-500";
+            } else if (estado === 'Justificada') {
+                badgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                iconClass = "fa-file-medical text-indigo-500";
+            }
+            return { badgeClass, iconClass };
         }
 
         function abrirFicha(id) {
@@ -687,7 +838,11 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        function cerrarSesion() {
+        function confirmarCerrarSesion() {
+            document.getElementById('modal-confirmar-salir').classList.remove('hidden');
+        }
+
+        function ejecutarCerrarSesion() {
             sessionStorage.clear();
             window.location.href = 'index.html';
         }
