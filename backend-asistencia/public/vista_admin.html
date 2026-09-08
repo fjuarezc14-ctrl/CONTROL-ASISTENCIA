@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASISTENCIA VT - Panel de Administración & Control Biométrico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @media print {
+            aside, header, .no-print { display: none !important; }
+            main { padding: 0 !important; }
+            table { width: 100% !important; font-size: 10px !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
+
+    <div class="flex h-screen overflow-hidden relative">
+        
+        <!-- Sidebar Corporativo VALETEC -->
+        <aside class="w-64 bg-slate-950 text-slate-300 flex flex-col justify-between shrink-0 shadow-2xl z-20 border-r border-slate-800/80">
+            <div class="p-5">
+                <!-- Logotipo e Identidad -->
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-lg shadow-lg shadow-blue-500/25">
+                        <i class="fa-solid fa-fingerprint"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-base font-black tracking-tight text-white">ASISTENCIA</span>
+                            <span class="text-base font-black text-blue-500">VT</span>
+                        </div>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">by VT VALETEC</p>
+                    </div>
+                </div>
+                
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-2">Gestión Institucional</p>
+                <nav class="space-y-1.5 text-xs font-semibold">
+                    <a href="vista_admin.html" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition-all">
+                        <i class="fa-solid fa-gauge-high w-4 text-center"></i> Panel de Control
+                    </a>
+                    <a href="vista_padre.html" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+                        <i class="fa-solid fa-users w-4 text-center"></i> Portal de Apoderados
+                    </a>
+                </nav>
+
+                <div class="mt-8 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800/80 text-[11px]">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-microchip text-blue-400"></i> Terminal Facial
+                    </p>
+                    <p class="text-slate-200 font-semibold truncate">ZKTeco FacePro ADMS</p>
+                    <div class="flex items-center gap-1.5 text-[10px] text-emerald-400 mt-1 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                        En línea &bull; Sincronizado
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-slate-800/80 text-xs">
+                <div class="flex items-center justify-between">
+                    <div class="overflow-hidden">
+                        <p class="text-white font-bold text-xs truncate" id="sidebar-user">Administrador General</p>
+                        <p class="text-[10px] text-blue-400 font-medium">Rol: Administrador</p>
+                    </div>
+                    <button onclick="cerrarSesion()" title="Cerrar Sesión" class="text-slate-400 hover:text-rose-400 transition p-2 rounded-xl hover:bg-slate-900 cursor-pointer">
+                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="flex-1 flex flex-col overflow-y-auto bg-slate-100">
+            
+            <!-- Barra Superior / Header -->
+            <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-4 shrink-0 shadow-sm sticky top-0 z-10">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Panel de Control de Asistencia</h1>
+                        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider">Enterprise</span>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium">Monitoreo biométrico de alumnos, búsqueda integral por DNI y gestión de avisos</p>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <!-- Reloj en vivo -->
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-900 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-mono font-bold shadow-sm">
+                        <i class="fa-regular fa-clock text-blue-400"></i>
+                        <span id="reloj-vivo">--:--:--</span>
+                    </div>
+
+                    <!-- Selector de fecha -->
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
+                        <i class="fa-regular fa-calendar text-blue-600"></i>
+                        <input type="date" id="filtro-fecha" onchange="cargarAsistencias()" class="bg-transparent font-bold text-slate-700 outline-none cursor-pointer">
+                    </div>
+
+                    <button onclick="irAHoy()" class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+                        Hoy
+                    </button>
+
+                    <button onclick="cargarAsistencias()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer">
+                        <i class="fa-solid fa-arrows-rotate"></i> Actualizar
+                    </button>
+                </div>
+            </header>
+
+            <div class="p-6 md:p-8 space-y-6 flex-1">
+                
+                <!-- Tarjetas KPI de Estadísticas en Vivo -->
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+                    
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold shrink-0">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registrados</p>
+                            <h3 id="kpi-total" class="text-2xl font-black text-slate-900">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold shrink-0">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Puntuales</p>
+                            <h3 id="kpi-puntuales" class="text-2xl font-black text-slate-900">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Tardanzas</p>
+                            <h3 id="kpi-tardanzas" class="text-2xl font-black text-slate-900">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg font-bold shrink-0">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Inasistencias</p>
+                            <h3 id="kpi-faltas" class="text-2xl font-black text-slate-900">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold shrink-0">
+                            <i class="fa-solid fa-file-medical"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Justificadas</p>
+                            <h3 id="kpi-justificadas" class="text-2xl font-black text-slate-900">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3.5 col-span-2 md:col-span-1">
+                        <div class="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center text-lg font-bold shrink-0">
+                            <i class="fa-solid fa-chart-pie text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Asistencia</p>
+                            <h3 id="kpi-tasa" class="text-2xl font-black text-slate-900">0%</h3>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Barra de Búsqueda Avanzada y Filtros de Administrador -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
+                        
+                        <!-- Búsqueda Universal por DNI, Código o Nombre -->
+                        <div class="w-full lg:w-96 relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                            </span>
+                            <input type="text" id="busqueda-texto" oninput="filtrarTabla()" placeholder="Buscar por DNI, Código, Nombre o Apellido..." 
+                                class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-slate-50/50 placeholder:text-slate-400">
+                            <button onclick="limpiarBusqueda()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Filtros desplegables combinados -->
+                        <div class="flex flex-wrap gap-2.5 items-center">
+                            
+                            <select id="filtro-nivel" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                                <option value="Todos">Nivel / Ciclo: Todos</option>
+                                <option value="Secundaria">Secundaria</option>
+                                <option value="Primaria">Primaria</option>
+                                <option value="Pre-Universitario">Pre-Universitario</option>
+                            </select>
+
+                            <select id="filtro-grado" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                                <option value="Todos">Grupo / Aula: Todos</option>
+                                <option value="3er Grado">3er Grado / Aula 301</option>
+                                <option value="5to Grado">5to Grado / Aula 204</option>
+                                <option value="1er Grado">1er Grado / Aula 102</option>
+                                <option value="Ciclo Intensivo">Ciclo Intensivo</option>
+                            </select>
+
+                            <select id="filtro-estado" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                                <option value="Todos">Estado: Todos</option>
+                                <option value="Puntual">Puntuales</option>
+                                <option value="Tardanza">Tardanzas</option>
+                                <option value="Falta">Inasistencias</option>
+                                <option value="Justificada">Justificadas</option>
+                            </select>
+
+                            <!-- Botones de Acción / Exportación -->
+                            <div class="flex items-center gap-1.5 ml-auto no-print">
+                                <button onclick="exportarExcel()" title="Exportar reporte CSV/Excel" class="px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-file-excel"></i> Excel
+                                </button>
+                                <button onclick="window.print()" title="Imprimir listado" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-print"></i> Imprimir
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Datos Integral del Administrador -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[850px]">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
+                                    <th class="p-4 pl-6">Estudiante / Alumno</th>
+                                    <th class="p-4">DNI & Código</th>
+                                    <th class="p-4">Nivel / Aula / Grupo</th>
+                                    <th class="p-4 text-center">Estado de Asistencia</th>
+                                    <th class="p-4 text-center">Entrada (ZKTeco)</th>
+                                    <th class="p-4 text-center">Salida</th>
+                                    <th class="p-4">Apoderado / Contacto</th>
+                                    <th class="p-4 text-center no-print">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-body" class="divide-y divide-slate-100 text-xs">
+                                <tr>
+                                    <td colspan="8" class="p-10 text-center text-slate-400">
+                                        <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600 mb-2"></i>
+                                        <p class="font-medium">Cargando base de datos de asistencia...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL 1: FICHA INTEGRAL DEL ALUMNO Y APODERADO -->
+    <div id="modal-ficha" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden fade-in">
+            <div class="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 p-6 text-white relative">
+                <button onclick="cerrarModal('modal-ficha')" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-blue-600/30 border border-blue-400/30 text-white flex items-center justify-center text-2xl font-bold shadow-inner">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <div class="inline-block px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-[10px] font-bold uppercase tracking-wider mb-1">
+                            Ficha Institucional
+                        </div>
+                        <h3 id="ficha-nombre" class="text-xl font-black leading-tight">Cargando...</h3>
+                        <p id="ficha-grado" class="text-slate-300 text-xs mt-0.5">Grupo y Nivel</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-4 text-xs">
+                <!-- Identificadores del estudiante -->
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">DNI Alumno</p>
+                        <p id="ficha-dni" class="font-black text-slate-800 text-sm mt-0.5">-</p>
+                    </div>
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Código Inst.</p>
+                        <p id="ficha-codigo" class="font-black text-slate-800 text-sm mt-0.5">-</p>
+                    </div>
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">PIN ZKTeco</p>
+                        <p id="ficha-pin" class="font-black text-blue-600 text-sm mt-0.5">-</p>
+                    </div>
+                </div>
+
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 pt-2">
+                    <i class="fa-solid fa-user-shield mr-1 text-blue-600"></i> Datos del Apoderado / Contacto de Emergencia
+                </h4>
+                
+                <div class="space-y-2.5">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Nombre Completo</p>
+                        <p id="ficha-apoderado-nombre" class="font-bold text-slate-800 text-xs mt-0.5">-</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Teléfono Móvil</p>
+                            <p id="ficha-apoderado-tel" class="font-bold text-slate-800 text-xs mt-0.5">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 overflow-hidden">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Correo Electrónico</p>
+                            <p id="ficha-apoderado-correo" class="font-bold text-slate-800 text-xs mt-0.5 truncate">-</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Dirección Domiciliaria</p>
+                        <p id="ficha-apoderado-dir" class="font-bold text-slate-800 text-xs mt-0.5">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2.5">
+                <button id="btn-ficha-wa" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs shadow-md shadow-emerald-600/20 cursor-pointer">
+                    <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp Apoderado
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: JUSTIFICAR INASISTENCIA O PERMISO -->
+    <div id="modal-justificar" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden fade-in">
+            <div class="bg-gradient-to-r from-indigo-700 to-blue-700 p-5 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-file-signature"></i> Justificar Asistencia Institucional
+                </h3>
+                <button onclick="cerrarModal('modal-justificar')" class="text-white/80 hover:text-white cursor-pointer">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <form onsubmit="guardarJustificacion(event)" class="p-6 space-y-4">
+                <input type="hidden" id="justificar-estudiante-id">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Alumno / Estudiante</p>
+                    <p id="justificar-alumno-nombre" class="text-sm font-black text-slate-800 mt-1">-</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Motivo Oficial</label>
+                    <textarea id="justificar-motivo" required rows="3" placeholder="Ej. Permiso médico certificado, cita hospitalaria, duelo familiar..." 
+                        class="w-full p-3 text-xs rounded-xl border border-slate-200 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md shadow-blue-600/25 cursor-pointer">
+                    Confirmar Justificación
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: MARCACIÓN MANUAL ADMINISTRATIVA -->
+    <div id="modal-manual" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden fade-in">
+            <div class="bg-gradient-to-r from-slate-900 to-blue-900 p-5 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> Marcación Manual Administrativa
+                </h3>
+                <button onclick="cerrarModal('modal-manual')" class="text-white/80 hover:text-white cursor-pointer">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <form onsubmit="guardarMarcacionManual(event)" class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="manual-estudiante-id">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Estudiante</p>
+                    <p id="manual-alumno-nombre" class="text-sm font-black text-slate-800 mt-0.5">-</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Estado a Asignar</label>
+                    <select id="manual-estado" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold outline-none focus:border-blue-500 bg-slate-50">
+                        <option value="Puntual">Puntual</option>
+                        <option value="Tardanza">Tardanza</option>
+                        <option value="Falta">Falta / Inasistencia</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Hora de Ingreso</label>
+                    <input type="time" id="manual-hora" required class="w-full p-2.5 rounded-xl border border-slate-200 font-mono font-bold outline-none focus:border-blue-500 bg-slate-50">
+                </div>
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition text-xs cursor-pointer">
+                    Registrar Marcación
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let estudiantesData = [];
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('filtro-fecha').value = hoy;
+
+        // Reloj en tiempo real
+        function actualizarReloj() {
+            const ahora = new Date();
+            document.getElementById('reloj-vivo').innerText = ahora.toLocaleTimeString('es-PE', { hour12: false });
+        }
+        setInterval(actualizarReloj, 1000);
+        actualizarReloj();
+
+        function irAHoy() {
+            document.getElementById('filtro-fecha').value = hoy;
+            cargarAsistencias();
+        }
+
+        // Sesión
+        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario_activo') || '{}');
+        if (usuarioSesion.nombre) {
+            document.getElementById('sidebar-user').innerText = usuarioSesion.nombre;
+        }
+
+        async function cargarAsistencias() {
+            const fecha = document.getElementById('filtro-fecha').value || hoy;
+            try {
+                const res = await fetch(`/api/asistencias/admin?fecha=${fecha}`);
+                const data = await res.json();
+                
+                if (data.success) {
+                    estudiantesData = data.estudiantes || [];
+                    actualizarKPIs(data.kpis);
+                    filtrarTabla();
+                }
+            } catch (err) {
+                console.warn('Error cargando asistencias:', err);
+            }
+        }
+
+        function actualizarKPIs(kpis) {
+            if (!kpis) return;
+            document.getElementById('kpi-total').innerText = kpis.total || 0;
+            document.getElementById('kpi-puntuales').innerText = kpis.puntuales || 0;
+            document.getElementById('kpi-tardanzas').innerText = kpis.tardanzas || 0;
+            document.getElementById('kpi-faltas').innerText = kpis.faltas || 0;
+            document.getElementById('kpi-justificadas').innerText = kpis.justificadas || 0;
+            document.getElementById('kpi-tasa').innerText = `${kpis.tasaAsistencia || 0}%`;
+        }
+
+        function limpiarBusqueda() {
+            document.getElementById('busqueda-texto').value = '';
+            filtrarTabla();
+        }
+
+        function filtrarTabla() {
+            const txt = document.getElementById('busqueda-texto').value.toLowerCase().trim();
+            const fNivel = document.getElementById('filtro-nivel').value;
+            const fGrado = document.getElementById('filtro-grado').value;
+            const fEstado = document.getElementById('filtro-estado').value;
+
+            const filtrados = estudiantesData.filter(e => {
+                const matchTexto = 
+                    (e.nombre || '').toLowerCase().includes(txt) ||
+                    (e.dni || '').toLowerCase().includes(txt) ||
+                    (e.codigo_estudiante || '').toLowerCase().includes(txt) ||
+                    (e.pin_biometrico || '').toLowerCase().includes(txt);
+
+                const matchNivel = fNivel === 'Todos' || (e.nivel || '').includes(fNivel);
+                const matchGrado = fGrado === 'Todos' || (e.grado || '').includes(fGrado);
+                const matchEstado = fEstado === 'Todos' || e.estado_hoy === fEstado;
+
+                return matchTexto && matchNivel && matchGrado && matchEstado;
+            });
+
+            renderTabla(filtrados);
+        }
+
+        function renderTabla(lista) {
+            const tbody = document.getElementById('tabla-body');
+            if (lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-slate-400 font-medium">No se encontraron estudiantes con los criterios de búsqueda.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = lista.map(e => {
+                let badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                let iconClass = "fa-circle-check text-emerald-500";
+
+                if (e.estado_hoy === 'Tardanza' || e.estado_hoy === 'Tardanza Grave') {
+                    badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                    iconClass = "fa-clock text-amber-500";
+                } else if (e.estado_hoy === 'Falta') {
+                    badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
+                    iconClass = "fa-circle-xmark text-rose-500";
+                } else if (e.estado_hoy === 'Justificada') {
+                    badgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                    iconClass = "fa-file-medical text-indigo-500";
+                }
+
+                return `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="p-3.5 pl-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-slate-200/80 text-slate-600 flex items-center justify-center font-black text-xs shrink-0 border border-slate-300/60">
+                                ${e.nombre ? e.nombre.charAt(0) : 'E'}
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-900">${e.nombre}</p>
+                                <p class="text-[10px] text-slate-400 font-medium">PIN: ${e.pin_biometrico || '-'}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-3.5">
+                        <p class="font-mono font-bold text-slate-700">${e.dni || 'Sin DNI'}</p>
+                        <p class="text-[10px] text-slate-400 font-mono tracking-wider">${e.codigo_estudiante || ''}</p>
+                    </td>
+                    <td class="p-3.5">
+                        <p class="font-bold text-slate-700">${e.grado} "${e.seccion}"</p>
+                        <p class="text-[10px] text-slate-400 font-medium">${e.nivel}</p>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="px-2.5 py-1 rounded-lg border text-[10px] font-bold tracking-wide inline-flex items-center gap-1.5 ${badgeClass}">
+                            <i class="fa-solid ${iconClass}"></i> ${e.estado_hoy}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-center font-mono text-xs font-bold ${e.estado_hoy === 'Falta' ? 'text-slate-400' : 'text-slate-700'}">
+                        ${e.hora_marca}
+                    </td>
+                    <td class="p-3.5 text-center font-mono text-xs font-bold text-slate-400">
+                        ${e.hora_salida || '--:-- --'}
+                    </td>
+                    <td class="p-3.5">
+                        <p class="font-semibold text-slate-800 text-[11px] truncate max-w-[150px]">${e.apoderado?.nombre || 'No asignado'}</p>
+                        <p class="text-[10px] text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-phone text-[9px]"></i> ${e.apoderado?.tel || '-'}
+                        </p>
+                    </td>
+                    <td class="p-3.5 no-print">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="abrirFicha(${e.id})" title="Ficha Completa del Alumno" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 transition flex items-center justify-center cursor-pointer">
+                                <i class="fa-solid fa-address-card text-xs"></i>
+                            </button>
+                            <button onclick="abrirWhatsApp('${e.apoderado?.tel || ''}', '${e.nombre}', '${e.estado_hoy}')" title="Aviso Institucional WhatsApp" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition flex items-center justify-center cursor-pointer">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                            </button>
+                            <button onclick="abrirModalJustificar(${e.id}, '${e.nombre}')" title="Justificar Inasistencia" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 transition flex items-center justify-center cursor-pointer">
+                                <i class="fa-solid fa-file-signature text-xs"></i>
+                            </button>
+                            <button onclick="abrirModalManual(${e.id}, '${e.nombre}')" title="Marcación Manual" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-200 transition flex items-center justify-center cursor-pointer">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function abrirFicha(id) {
+            const e = estudiantesData.find(x => x.id === id);
+            if (!e) return;
+
+            document.getElementById('ficha-nombre').innerText = e.nombre;
+            document.getElementById('ficha-grado').innerText = `${e.grado} - Sección ${e.seccion} (${e.nivel})`;
+            document.getElementById('ficha-dni').innerText = e.dni || '-';
+            document.getElementById('ficha-codigo').innerText = e.codigo_estudiante || '-';
+            document.getElementById('ficha-pin').innerText = e.pin_biometrico || '-';
+
+            document.getElementById('ficha-apoderado-nombre').innerText = e.apoderado?.nombre || 'No asignado';
+            document.getElementById('ficha-apoderado-tel').innerText = e.apoderado?.tel || 'Sin teléfono';
+            document.getElementById('ficha-apoderado-correo').innerText = e.apoderado?.correo || 'Sin correo';
+            document.getElementById('ficha-apoderado-dir').innerText = e.apoderado?.direccion || 'Sin dirección';
+
+            const btnWa = document.getElementById('btn-ficha-wa');
+            btnWa.onclick = () => abrirWhatsApp(e.apoderado?.tel, e.nombre, e.estado_hoy);
+
+            document.getElementById('modal-ficha').classList.remove('hidden');
+        }
+
+        function abrirWhatsApp(tel, alumno, estado) {
+            if (!tel) {
+                alert('Este alumno no tiene número de teléfono registrado.');
+                return;
+            }
+            let mensaje = "";
+            if (estado === 'Falta') {
+                mensaje = `🔴 *COMUNICADO DE CONTROL DE ASISTENCIA VT*\nEstimado apoderado, le informamos que el estudiante *${alumno}* NO registra marcación en el lector facial de la institución el día de hoy. Por favor confirmar el motivo a la brevedad.`;
+            } else if (estado === 'Tardanza') {
+                mensaje = `🟡 *AVISO DE ASISTENCIA VT*\nEstimado apoderado, le informamos que el estudiante *${alumno}* ha registrado su ingreso a la institución con TARDANZA.`;
+            } else {
+                mensaje = `🟢 *ASISTENCIA VT*\nEstimado apoderado, nos comunicamos de la coordinación institucional respecto al estudiante *${alumno}*...`;
+            }
+
+            const url = `https://wa.me/51${tel}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        }
+
+        function abrirModalJustificar(id, nombre) {
+            document.getElementById('justificar-estudiante-id').value = id;
+            document.getElementById('justificar-alumno-nombre').innerText = nombre;
+            document.getElementById('justificar-motivo').value = '';
+            document.getElementById('modal-justificar').classList.remove('hidden');
+        }
+
+        async function guardarJustificacion(e) {
+            e.preventDefault();
+            const id = document.getElementById('justificar-estudiante-id').value;
+            const motivo = document.getElementById('justificar-motivo').value.trim();
+            const fecha = document.getElementById('filtro-fecha').value;
+
+            try {
+                await fetch('/api/asistencias/justificar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estudiante_id: id, fecha, motivo })
+                });
+            } catch (err) {
+                console.warn(err);
+            }
+
+            const est = estudiantesData.find(x => x.id == id);
+            if (est) est.estado_hoy = 'Justificada';
+            cerrarModal('modal-justificar');
+            filtrarTabla();
+        }
+
+        function abrirModalManual(id, nombre) {
+            document.getElementById('manual-estudiante-id').value = id;
+            document.getElementById('manual-alumno-nombre').innerText = nombre;
+            const ahora = new Date();
+            const hh = String(ahora.getHours()).padStart(2, '0');
+            const mm = String(ahora.getMinutes()).padStart(2, '0');
+            document.getElementById('manual-hora').value = `${hh}:${mm}`;
+            document.getElementById('modal-manual').classList.remove('hidden');
+        }
+
+        async function guardarMarcacionManual(e) {
+            e.preventDefault();
+            const id = document.getElementById('manual-estudiante-id').value;
+            const estado = document.getElementById('manual-estado').value;
+            const hora = document.getElementById('manual-hora').value;
+            const fecha = document.getElementById('filtro-fecha').value;
+
+            try {
+                await fetch('/api/asistencias/manual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estudiante_id: id, fecha, estado, hora: `${hora}:00` })
+                });
+            } catch (err) {
+                console.warn(err);
+            }
+
+            const est = estudiantesData.find(x => x.id == id);
+            if (est) {
+                est.estado_hoy = estado;
+                est.hora_marca = `${hora} ${parseInt(hora) < 12 ? 'AM' : 'PM'}`;
+            }
+            cerrarModal('modal-manual');
+            filtrarTabla();
+        }
+
+        function exportarExcel() {
+            const fecha = document.getElementById('filtro-fecha').value || hoy;
+            let csv = "ID,DNI,Codigo,Nombre,Nivel,Grado,Seccion,Estado,Hora_Ingreso,Hora_Salida,Apoderado,Telefono\n";
+            estudiantesData.forEach(e => {
+                csv += `"${e.id}","${e.dni || ''}","${e.codigo_estudiante || ''}","${e.nombre}","${e.nivel}","${e.grado}","${e.seccion}","${e.estado_hoy}","${e.hora_marca}","${e.hora_salida || ''}","${e.apoderado?.nombre || ''}","${e.apoderado?.tel || ''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Asistencia_VT_${fecha}.csv`;
+            a.click();
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function cerrarSesion() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // Carga inicial
+        cargarAsistencias();
+    </script>
+</body>
+</html>

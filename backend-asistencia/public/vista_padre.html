@@ -3,35 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Apoderados - Santa Teresita</title>
+    <title>ASISTENCIA VT - Portal de Apoderados by VALETEC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
-    <!-- Barra Superior -->
-    <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+    <!-- Barra Superior Corporativa VALETEC -->
+    <header class="bg-slate-950 text-white shadow-xl sticky top-0 z-30 border-b border-slate-800/80">
+        <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/15 backdrop-blur-md rounded-xl flex items-center justify-center text-lg border border-white/20">
-                    <i class="fa-solid fa-school"></i>
+                <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center text-white text-base shadow-md shadow-blue-500/20">
+                    <i class="fa-solid fa-fingerprint"></i>
                 </div>
                 <div>
-                    <h1 class="font-black text-base tracking-tight leading-tight">SANTA TERESITA</h1>
-                    <p class="text-[10px] text-blue-200 tracking-wider uppercase">Portal de Apoderados</p>
+                    <div class="flex items-center gap-1">
+                        <span class="font-black text-sm tracking-tight text-white">ASISTENCIA</span>
+                        <span class="font-black text-sm text-blue-500">VT</span>
+                    </div>
+                    <p class="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Portal de Apoderados &bull; by VALETEC</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <div class="text-right hidden sm:block">
-                    <p id="nav-apoderado-nombre" class="text-xs font-bold leading-tight">Familia Gómez Torres</p>
-                    <p class="text-[10px] text-blue-200">Apoderado Titular</p>
+                    <p id="nav-apoderado-nombre" class="text-xs font-bold leading-tight text-slate-200">Familia Gómez Torres</p>
+                    <p class="text-[10px] text-blue-400 font-medium">Apoderado Titular</p>
                 </div>
-                <button onclick="cerrarSesion()" title="Cerrar Sesión" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-xl transition flex items-center gap-1.5 text-xs">
+                <button onclick="cerrarSesion()" title="Cerrar Sesión" class="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white p-2 rounded-xl transition flex items-center gap-1.5 text-xs border border-slate-800 cursor-pointer">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span class="hidden sm:inline">Salir</span>
                 </button>
@@ -43,29 +50,29 @@
     <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
         
         <!-- Banner de Bienvenida -->
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden fade-in">
+        <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden fade-in border border-slate-800/80">
             <div class="relative z-10 max-w-xl">
-                <span class="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">
-                    <i class="fa-solid fa-shield-halved mr-1"></i> Biometría Facial Activa
+                <span class="bg-blue-500/20 text-blue-300 border border-blue-400/20 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                    Terminal Facial Activo
                 </span>
-                <h2 id="banner-saludo" class="text-2xl sm:text-3xl font-black mb-2">Bienvenido(a)</h2>
-                <p class="text-blue-100 text-xs sm:text-sm leading-relaxed">
-                    Monitoree en tiempo real el ingreso y salida de sus hijos mediante el sistema de reconocimiento facial del colegio.
+                <h2 id="banner-saludo" class="text-2xl sm:text-3xl font-black mb-2 tracking-tight">Bienvenido(a)</h2>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    Monitoree en tiempo real el registro biométrico de ingreso y salida de sus hijos en la institución mediante terminales faciales de alta precisión.
                 </p>
             </div>
-            <!-- Icono Decorativo -->
-            <i class="fa-solid fa-children absolute right-4 -bottom-6 text-9xl text-white/10 pointer-events-none hidden sm:block"></i>
+            <i class="fa-solid fa-users absolute right-4 -bottom-6 text-9xl text-white/5 pointer-events-none hidden sm:block"></i>
         </div>
 
-        <!-- Barra de Fecha y Estado -->
-        <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="flex items-center gap-2 text-xs font-bold text-slate-700">
+        <!-- Barra de Estado y Fecha -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-xs">
+            <div class="flex items-center gap-2 font-bold text-slate-700">
                 <i class="fa-regular fa-calendar-check text-blue-600 text-base"></i>
                 <span>Monitoreo del día: <span id="fecha-hoy-texto" class="text-blue-600">Hoy</span></span>
             </div>
             <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-[11px] font-semibold text-slate-500">Terminales en Línea</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-[11px] font-semibold text-slate-500">Sistema Sincronizado</span>
             </div>
         </div>
 
@@ -73,57 +80,57 @@
         <div id="contenedor-hijos" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="col-span-full p-12 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">
                 <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600 mb-2"></i>
-                <p class="text-xs">Consultando información de sus hijos...</p>
+                <p class="text-xs font-semibold">Consultando información de sus hijos...</p>
             </div>
         </div>
 
-        <!-- Historial Semanal Informativo -->
+        <!-- Historial Semanal y Métricas -->
         <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> Resumen de la Semana
+                    <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> Resumen de Puntualidad
                 </h3>
-                <span class="text-[11px] text-slate-400">Últimos 5 días hábiles</span>
+                <span class="text-[11px] text-slate-400">Últimos registros hábiles</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-xs">
-                <div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-100">
+                <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100">
                     <p class="text-emerald-700 font-black text-xl">100%</p>
                     <p class="text-emerald-600 text-[11px] font-medium">Asistencia Promedio</p>
                 </div>
-                <div class="p-3 rounded-2xl bg-blue-50 border border-blue-100">
+                <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-100">
                     <p class="text-blue-700 font-black text-xl">07:22 AM</p>
-                    <p class="text-blue-600 text-[11px] font-medium">Hora Promedio de Entrada</p>
+                    <p class="text-blue-600 text-[11px] font-medium">Hora Promedio Entrada</p>
                 </div>
-                <div class="p-3 rounded-2xl bg-amber-50 border border-amber-100">
-                    <p class="text-amber-700 font-black text-xl">0</p>
-                    <p class="text-amber-600 text-[11px] font-medium">Faltas Injustificadas</p>
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <p class="text-slate-700 font-black text-xl">0</p>
+                    <p class="text-slate-500 text-[11px] font-medium">Inasistencias Sin Justificar</p>
                 </div>
             </div>
         </div>
 
-        <!-- Ayuda y Contacto con el Colegio -->
+        <!-- Contacto con Administración -->
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-base shrink-0">
                     <i class="fa-solid fa-headset"></i>
                 </div>
                 <div>
-                    <p class="font-bold text-slate-800">¿Tiene dudas o necesita justificar una inasistencia?</p>
-                    <p class="text-slate-500 text-[11px]">Comuníquese directamente con la coordinación de auxiliares.</p>
+                    <p class="font-bold text-slate-800">¿Requiere justificar una inasistencia o permiso?</p>
+                    <p class="text-slate-500 text-[11px]">Comuníquese directamente con la administración institucional.</p>
                 </div>
             </div>
-            <a href="https://wa.me/51987654320?text=Hola,%20deseo%20consultar%20sobre%20la%20asistencia%20de%20mi%20hijo(a)" target="_blank" 
-                class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md shadow-emerald-600/20 shrink-0">
-                <i class="fa-brands fa-whatsapp text-sm"></i> Escribir a Auxiliaría
+            <a href="https://wa.me/51987000111?text=Hola,%20deseo%20comunicarme%20con%20administraci%C3%B3n%20sobre%20la%20asistencia%20de%20mi%20hijo(a)" target="_blank" 
+                class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md shadow-emerald-600/20 shrink-0 cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Contactar Administración
             </a>
         </div>
 
     </main>
 
-    <!-- Pie de página -->
+    <!-- Pie de página con marca -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-auto">
-        Santa Teresita - Control de Asistencia Biométrico &copy; 2026
+        ASISTENCIA VT &copy; 2026 &bull; Desarrollado por <span class="font-bold text-slate-600">VT VALETEC</span>
     </footer>
 
     <script>
@@ -135,7 +142,6 @@
             document.getElementById('banner-saludo').innerText = `Bienvenido(a), ${usuarioSesion.nombre}`;
         }
 
-        // Formatear fecha actual en español
         const hoy = new Date();
         const opcionesFecha = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
         document.getElementById('fecha-hoy-texto').innerText = hoy.toLocaleDateString('es-PE', opcionesFecha);
@@ -153,7 +159,7 @@
                         <div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">
                             <i class="fa-solid fa-circle-exclamation text-3xl text-amber-500 mb-2"></i>
                             <p class="font-bold text-slate-700 text-sm">No se encontraron estudiantes asociados a este DNI.</p>
-                            <p class="text-xs mt-1">Por favor comuníquese con el colegio para actualizar su ficha de apoderado.</p>
+                            <p class="text-xs mt-1">Por favor comuníquese con la administración para verificar su registro de apoderado.</p>
                         </div>
                     `;
                 }
@@ -215,17 +221,20 @@
                     <div class="p-6 flex-1 flex flex-col justify-between space-y-6">
                         <!-- Perfil Alumno -->
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl font-bold border border-blue-100 shadow-sm shrink-0">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600/10 to-indigo-600/20 text-blue-600 flex items-center justify-center text-2xl font-bold border border-blue-200 shadow-sm shrink-0">
                                 <i class="fa-solid fa-user-graduate"></i>
                             </div>
                             <div>
-                                <h3 class="text-lg font-black text-slate-800 leading-tight">${h.nombre}</h3>
+                                <h3 class="text-base font-black text-slate-800 leading-tight">${h.nombre}</h3>
                                 <p class="text-xs font-medium text-slate-500 mt-0.5">${h.grado} "${h.seccion}" &bull; ${h.nivel}</p>
-                                <span class="text-[10px] font-mono text-slate-400 tracking-wider">CÓD: ${h.codigo_estudiante || ''}</span>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] font-mono text-slate-400">DNI: ${h.dni || '-'}</span>
+                                    <span class="text-[10px] font-mono text-slate-400">&bull; CÓD: ${h.codigo_estudiante || ''}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Bloque de Marcación Lector ZKTeco -->
+                        <!-- Bloque de Marcación Lector Facial -->
                         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
                             <div class="flex items-center justify-between border-b border-slate-200/60 pb-2">
                                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Hora de Entrada</span>
@@ -237,10 +246,10 @@
                             </div>
                         </div>
 
-                        <!-- Indicador de Puntualidad y Horario -->
+                        <!-- Indicador de Horario Regular -->
                         <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-100 pt-3">
-                            <span>Horario regular: 07:30 AM - 01:30 PM</span>
-                            <span class="text-blue-600 font-semibold cursor-pointer hover:underline">Ver detalle mensual &rarr;</span>
+                            <span>Horario institucional habitual</span>
+                            <span class="text-blue-600 font-semibold cursor-pointer hover:underline">Detalle semanal &rarr;</span>
                         </div>
                     </div>
                 </div>
@@ -253,7 +262,6 @@
             window.location.href = 'index.html';
         }
 
-        // Carga inicial
         cargarHijos();
     </script>
 </body>
