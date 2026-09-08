@@ -3,234 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Auxiliar - Colegio Santa Teresa</title>
+    <title>Panel de Auxiliares - Control de Asistencia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
     <div class="flex h-screen overflow-hidden relative">
-        <!-- Menú Lateral -->
-        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0">
+        
+        <!-- Barra Lateral (Sidebar) -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 shadow-xl z-20">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-8">
-                    <div class="bg-blue-600 text-white p-2.5 rounded-lg shadow-lg">
+                    <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
                         <i class="fa-solid fa-school text-xl"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-wide text-white">SANTA<span class="text-blue-400"> TERESA</span></span>
+                    <div>
+                        <span class="text-lg font-black tracking-wide text-white">SANTA<span class="text-blue-400"> TERESITA</span></span>
+                        <p class="text-[10px] text-slate-400 tracking-widest uppercase">ZKTeco Biometrics</p>
+                    </div>
                 </div>
                 
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Menú Principal</p>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Módulos</p>
                 <nav class="space-y-2 text-sm font-medium">
-                    <div class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white transition-all cursor-default">
-                        <i class="fa-solid fa-clipboard-user w-5"></i> Panel Auxiliares
-                    </div>
+                    <a href="vista_auxiliar.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition-all">
+                        <i class="fa-solid fa-clipboard-user w-5 text-center"></i> Control Asistencia
+                    </a>
+                    <a href="vista_padre.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-users w-5 text-center"></i> Vista Apoderados
+                    </a>
                 </nav>
             </div>
-            <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
-                <a href="index.html" class="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors text-sm font-bold">
-                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-                </a>
+            
+            <div class="p-6 border-t border-slate-800 text-xs">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 font-semibold" id="sidebar-user">Aux. Carmen Rojas</p>
+                        <p class="text-[11px] text-emerald-400 flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Terminal Conectado
+                        </p>
+                    </div>
+                    <button onclick="cerrarSesion()" title="Cerrar Sesión" class="text-slate-400 hover:text-rose-400 transition p-2 rounded-lg hover:bg-slate-800">
+                        <i class="fa-solid fa-right-from-bracket text-base"></i>
+                    </button>
+                </div>
             </div>
         </aside>
 
-        <!-- Contenido Principal -->
-        <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0">
-                <h1 class="text-2xl font-bold text-slate-800">Control de Asistencia</h1>
-                <div class="flex items-center gap-3">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-sm font-bold text-slate-800">Aux. María Salazar Cabrera</p>
-                        <p class="text-xs text-slate-400">Turno Mañana</p>
+        <!-- Contenedor Principal -->
+        <main class="flex-1 flex flex-col overflow-y-auto bg-slate-50">
+            
+            <!-- Encabezado -->
+            <header class="bg-white border-b border-slate-200 px-8 py-4 flex flex-wrap justify-between items-center gap-4 shrink-0 shadow-sm sticky top-0 z-10">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800">Control de Asistencia Escolar</h1>
+                    <p class="text-xs text-slate-500 font-medium">Registro facial de ingreso y salida en tiempo real</p>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
+                        <i class="fa-regular fa-calendar text-blue-600"></i>
+                        <input type="date" id="filtro-fecha" onchange="cargarAsistencias()" class="bg-transparent font-bold text-slate-700 outline-none cursor-pointer">
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200">
-                        <i class="fa-solid fa-user-shield"></i>
-                    </div>
+                    <button onclick="cargarAsistencias()" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-blue-200">
+                        <i class="fa-solid fa-arrows-rotate"></i> Actualizar
+                    </button>
                 </div>
             </header>
 
-            <div class="p-6 md:p-8 flex-1">
-                <section class="space-y-6 fade-in">
-                    
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4"><i class="fa-solid fa-filter mr-1"></i> Filtros de Búsqueda</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Nivel</label>
-                                <select id="filtro-nivel" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
-                                    <option value="Todos">Todos</option>
-                                    <option value="Secundaria">Primaria</option>
-                                    <option value="Primaria">Secundaria</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Grado</label>
-                                <select id="filtro-grado" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
-                                    <option value="Todos">Todos</option>
-                                    <option value="1er Grado">1er Grado</option>
-                                    <option value="2do Grado">2do Grado</option>
-                                    <option value="3er Grado">3er Grado</option>
-                    
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Sección</label>
-                                <select id="filtro-seccion" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
-                                    <option value="Todas">Todas</option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Estado</label>
-                                <select id="filtro-estado" onchange="renderTablaAuxiliar()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none bg-slate-50">
-                                    <option value="Todos">Todos</option>
-                                    <option value="Puntual">Puntuales</option>
-                                    <option value="Tardanza">Tardanzas</option>
-                                    <option value="Falta">Faltaron</option>
-                                </select>
-                            </div>
+            <div class="p-6 md:p-8 space-y-6 flex-1">
+                
+                <!-- Tarjetas KPI de Resumen del Día -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Alumnos</p>
+                            <h3 id="kpi-total" class="text-2xl font-black text-slate-800">0</h3>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto w-full">
-                        <table class="w-full text-left border-collapse min-w-max">
+                    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Puntuales</p>
+                            <h3 id="kpi-puntuales" class="text-2xl font-black text-slate-800">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Tardanzas</p>
+                            <h3 id="kpi-tardanzas" class="text-2xl font-black text-slate-800">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Faltas</p>
+                            <h3 id="kpi-faltas" class="text-2xl font-black text-slate-800">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex items-center gap-4 col-span-2 md:col-span-1">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-file-medical"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">Justificadas</p>
+                            <h3 id="kpi-justificadas" class="text-2xl font-black text-slate-800">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Filtros y Búsqueda -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                        <div class="w-full md:w-96 relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                            </span>
+                            <input type="text" id="busqueda-texto" oninput="filtrarTabla()" placeholder="Buscar alumno por nombre, apellido o código..." 
+                                class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none">
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2.5 w-full md:w-auto">
+                            <select id="filtro-nivel" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                                <option value="Todos">Todos los Niveles</option>
+                                <option value="Secundaria">Secundaria</option>
+                                <option value="Primaria">Primaria</option>
+                            </select>
+
+                            <select id="filtro-grado" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                                <option value="Todos">Todos los Grados</option>
+                                <option value="1er Grado">1er Grado</option>
+                                <option value="2do Grado">2do Grado</option>
+                                <option value="3er Grado">3er Grado</option>
+                                <option value="4to Grado">4to Grado</option>
+                                <option value="5to Grado">5to Grado</option>
+                            </select>
+
+                            <select id="filtro-seccion" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                                <option value="Todas">Sección: Todas</option>
+                                <option value="A">Sección A</option>
+                                <option value="B">Sección B</option>
+                                <option value="C">Sección C</option>
+                            </select>
+
+                            <select id="filtro-estado" onchange="filtrarTabla()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold outline-none bg-slate-50 text-slate-700">
+                                <option value="Todos">Estado: Todos</option>
+                                <option value="Puntual">Puntuales</option>
+                                <option value="Tardanza">Tardanzas</option>
+                                <option value="Falta">Faltas</option>
+                                <option value="Justificada">Justificadas</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Asistencia -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[700px]">
                             <thead>
-                                <tr class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                                <tr class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
                                     <th class="p-4 pl-6">Estudiante</th>
-                                    <th class="p-4">Grado y Sección</th>
-                                    <th class="p-4 text-center">Estado (Hoy)</th>
-                                    <th class="p-4 text-center">Hora Marca</th>
+                                    <th class="p-4">Nivel / Grado / Sección</th>
+                                    <th class="p-4 text-center">Estado</th>
+                                    <th class="p-4 text-center">Hora Marcación</th>
                                     <th class="p-4 text-center">Acciones Rápidas</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-alumnos-body" class="divide-y divide-slate-100 text-sm">
-                                <!-- Los alumnos se cargarán aquí con JavaScript -->
+                            <tbody id="tabla-body" class="divide-y divide-slate-100 text-sm">
+                                <tr>
+                                    <td colspan="5" class="p-8 text-center text-slate-400">
+                                        <i class="fa-solid fa-circle-notch fa-spin text-xl text-blue-600 mb-2"></i>
+                                        <p>Cargando registros biométricos...</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                </section>
+                </div>
+
             </div>
         </main>
     </div>
 
-    <!-- Modal Ficha de Alumno -->
+    <!-- MODAL 1: FICHA TÉCNICA DEL ALUMNO Y APODERADO -->
     <div id="modal-ficha" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <!-- El contenido del modal es igual al tuyo -->
-        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 overflow-hidden fade-in">
-            <div class="bg-blue-600 p-6 text-white relative">
-                <button onclick="cerrarModalFicha()" class="absolute top-4 right-4 text-blue-200 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden fade-in">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white relative">
+                <button onclick="cerrarModal('modal-ficha')" class="absolute top-4 right-4 text-white/80 hover:text-white cursor-pointer text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-full bg-white text-blue-600 flex items-center justify-center text-2xl font-bold shadow-md">
+                    <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center text-2xl font-bold shadow-inner">
                         <i class="fa-solid fa-user-graduate"></i>
                     </div>
                     <div>
-                        <h3 id="ficha-nombre" class="text-xl font-bold leading-tight">Cargando...</h3>
-                        <p id="ficha-grado" class="text-blue-100 text-sm">Cargando...</p>
+                        <h3 id="ficha-nombre" class="text-xl font-black">Cargando...</h3>
+                        <p id="ficha-grado" class="text-blue-100 text-xs font-medium">Grado y Sección</p>
                     </div>
                 </div>
             </div>
             
-            <div class="p-6 space-y-5">
-                <div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Datos del Apoderado</h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                            <i class="fa-solid fa-user-tie text-slate-400 w-5 text-center"></i>
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase">Nombre Completo</p>
-                                <p id="ficha-apoderado-nombre" class="font-bold text-slate-800 text-sm">Cargando...</p>
-                            </div>
+            <div class="p-6 space-y-4">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
+                    <i class="fa-solid fa-user-shield mr-1"></i> Datos del Apoderado Responsable
+                </h4>
+                
+                <div class="space-y-3 text-xs">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Nombre Completo</p>
+                        <p id="ficha-apoderado-nombre" class="font-bold text-slate-800 text-sm mt-0.5">-</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Teléfono Móvil</p>
+                            <p id="ficha-apoderado-tel" class="font-bold text-slate-800 text-sm mt-0.5">-</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                <i class="fa-solid fa-phone text-slate-400 w-5 text-center"></i>
-                                <div>
-                                    <p class="text-[10px] font-bold text-slate-500 uppercase">Celular</p>
-                                    <p id="ficha-apoderado-tel" class="font-bold text-slate-800 text-sm">Cargando...</p>
-                                </div>
-                            </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 overflow-hidden">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Correo Electrónico</p>
+                            <p id="ficha-apoderado-correo" class="font-bold text-slate-800 text-sm mt-0.5 truncate">-</p>
                         </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Dirección Domiciliaria</p>
+                        <p id="ficha-apoderado-dir" class="font-bold text-slate-800 text-sm mt-0.5">-</p>
                     </div>
                 </div>
             </div>
-            
-            <div class="bg-slate-50 p-4 border-t border-slate-100 flex gap-3">
-                <button id="btn-ficha-wa" onclick="" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> Contactar Padre
+
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+                <button id="btn-ficha-wa" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-md shadow-emerald-600/20">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Contactar por WhatsApp
                 </button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Datos simulados (Aquí incluimos a tu estudiante de prueba)
-        const appState = {
-            estudiantes: [
-                { id: '734254', nombre: 'Juan Pérez', nivel: 'Secundaria', grado: '3er Grado', seccion: 'A', estado_hoy: 'Puntual', hora_marca: '07:30 AM', apoderado: { nombre: 'Papá de Juan', tel: '987654321' } },
-                { id: 'E002', nombre: 'Lucía Gómez Torres', nivel: 'Secundaria', grado: '3er Grado', seccion: 'B', estado_hoy: 'Falta', hora_marca: '--:-- --', apoderado: { nombre: 'María Torres', tel: '999888777' } },
-                { id: 'E003', nombre: 'Mateo Gómez Torres', nivel: 'Primaria', grado: '1er Grado', seccion: 'A', estado_hoy: 'Tardanza', hora_marca: '08:10 AM', apoderado: { nombre: 'María Torres', tel: '999888777' } }
-            ]
-        };
+    <!-- MODAL 2: JUSTIFICAR INASISTENCIA -->
+    <div id="modal-justificar" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden fade-in">
+            <div class="bg-indigo-600 p-5 text-white flex justify-between items-center">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-file-signature"></i> Justificar Asistencia
+                </h3>
+                <button onclick="cerrarModal('modal-justificar')" class="text-white/80 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="guardarJustificacion(event)" class="p-6 space-y-4">
+                <input type="hidden" id="justificar-estudiante-id">
+                <div>
+                    <p class="text-xs font-bold text-slate-600 uppercase">Alumno</p>
+                    <p id="justificar-alumno-nombre" class="text-sm font-black text-slate-800 mt-1">-</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Motivo de Justificación</label>
+                    <textarea id="justificar-motivo" required rows="3" placeholder="Ej. Permiso médico certificado, cita hospitalaria..." 
+                        class="w-full p-3 text-sm rounded-xl border border-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                    Confirmar Justificación
+                </button>
+            </form>
+        </div>
+    </div>
 
-        function renderTablaAuxiliar() {
+    <script>
+        let estudiantesData = [];
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('filtro-fecha').value = hoy;
+
+        // Recuperar usuario logueado
+        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario_activo') || '{}');
+        if (usuarioSesion.nombre) {
+            document.getElementById('sidebar-user').innerText = usuarioSesion.nombre;
+        }
+
+        async function cargarAsistencias() {
+            const fecha = document.getElementById('filtro-fecha').value || hoy;
+            try {
+                const res = await fetch(`/api/asistencias/auxiliar?fecha=${fecha}`);
+                const data = await res.json();
+                
+                if (data.success) {
+                    estudiantesData = data.estudiantes || [];
+                    actualizarKPIs(data.kpis);
+                    filtrarTabla();
+                }
+            } catch (err) {
+                console.warn('Error cargando asistencias de la API, usando mock local:', err);
+            }
+        }
+
+        function actualizarKPIs(kpis) {
+            if (!kpis) return;
+            document.getElementById('kpi-total').innerText = kpis.total || 0;
+            document.getElementById('kpi-puntuales').innerText = kpis.puntuales || 0;
+            document.getElementById('kpi-tardanzas').innerText = kpis.tardanzas || 0;
+            document.getElementById('kpi-faltas').innerText = kpis.faltas || 0;
+            document.getElementById('kpi-justificadas').innerText = kpis.justificadas || 0;
+        }
+
+        function filtrarTabla() {
+            const txt = document.getElementById('busqueda-texto').value.toLowerCase();
             const fNivel = document.getElementById('filtro-nivel').value;
             const fGrado = document.getElementById('filtro-grado').value;
             const fSeccion = document.getElementById('filtro-seccion').value;
             const fEstado = document.getElementById('filtro-estado').value;
 
-            const filtrados = appState.estudiantes.filter(e => {
-                return (fNivel === 'Todos' || e.nivel === fNivel) &&
-                       (fGrado === 'Todos' || e.grado === fGrado) &&
-                       (fSeccion === 'Todas' || e.seccion === fSeccion) &&
-                       (fEstado === 'Todos' || e.estado_hoy === fEstado);
+            const filtrados = estudiantesData.filter(e => {
+                const matchTexto = (e.nombre || '').toLowerCase().includes(txt) || 
+                                   (e.codigo_estudiante || '').toLowerCase().includes(txt);
+                const matchNivel = fNivel === 'Todos' || e.nivel === fNivel;
+                const matchGrado = fGrado === 'Todos' || e.grado === fGrado;
+                const matchSeccion = fSeccion === 'Todas' || e.seccion === fSeccion;
+                const matchEstado = fEstado === 'Todos' || e.estado_hoy === fEstado;
+
+                return matchTexto && matchNivel && matchGrado && matchSeccion && matchEstado;
             });
 
-            const tbody = document.getElementById('tabla-alumnos-body');
-            
-            if(filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400">No se encontraron alumnos con esos filtros.</td></tr>`;
+            renderTabla(filtrados);
+        }
+
+        function renderTabla(lista) {
+            const tbody = document.getElementById('tabla-body');
+            if (lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No se encontraron estudiantes con los filtros aplicados.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtrados.map(e => {
-                let badgeClass = "bg-green-100 text-green-700 border-green-200";
-                let iconClass = "fa-check-circle text-green-500";
-                if(e.estado_hoy === 'Tardanza') { badgeClass = "bg-yellow-100 text-yellow-700 border-yellow-200"; iconClass = "fa-clock text-yellow-500"; }
-                if(e.estado_hoy === 'Falta') { badgeClass = "bg-red-100 text-red-700 border-red-200"; iconClass = "fa-circle-xmark text-red-500"; }
+            tbody.innerHTML = lista.map(e => {
+                let badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                let iconClass = "fa-circle-check text-emerald-500";
+
+                if (e.estado_hoy === 'Tardanza' || e.estado_hoy === 'Tardanza Grave') {
+                    badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                    iconClass = "fa-clock text-amber-500";
+                } else if (e.estado_hoy === 'Falta') {
+                    badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
+                    iconClass = "fa-circle-xmark text-rose-500";
+                } else if (e.estado_hoy === 'Justificada') {
+                    badgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                    iconClass = "fa-file-medical text-indigo-500";
+                }
 
                 return `
-                <tr class="hover:bg-slate-50 transition-colors">
+                <tr class="hover:bg-slate-50/80 transition-colors">
                     <td class="p-4 pl-6">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-400"><i class="fa-solid fa-user"></i></div>
+                            <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-200">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
                             <div>
                                 <p class="font-bold text-slate-800">${e.nombre}</p>
-                                <p class="text-[10px] text-slate-400 font-mono">PIN: ${e.id}</p>
+                                <p class="text-[10px] text-slate-400 font-mono tracking-wider">${e.codigo_estudiante || ''}</p>
                             </div>
                         </div>
                     </td>
                     <td class="p-4">
                         <p class="font-bold text-slate-700">${e.grado} "${e.seccion}"</p>
-                        <p class="text-[11px] text-slate-500">${e.nivel}</p>
+                        <p class="text-[11px] text-slate-400 font-medium">${e.nivel}</p>
                     </td>
                     <td class="p-4 text-center">
-                        <span class="px-2.5 py-1 rounded-md border text-[11px] font-bold uppercase tracking-wide inline-flex items-center gap-1.5 ${badgeClass}">
+                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold tracking-wide inline-flex items-center gap-1.5 ${badgeClass}">
                             <i class="fa-solid ${iconClass}"></i> ${e.estado_hoy}
                         </span>
                     </td>
-                    <td class="p-4 text-center font-mono text-xs font-bold text-slate-500">${e.hora_marca}</td>
+                    <td class="p-4 text-center font-mono text-xs font-bold text-slate-600">${e.hora_marca}</td>
                     <td class="p-4">
-                        <div class="flex items-center justify-center gap-2">
-                            <button onclick="abrirModalFicha('${e.id}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center" title="Ver Ficha Alumno">
-                                <i class="fa-solid fa-address-card"></i>
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="abrirFicha(${e.id})" title="Ficha del Alumno" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 transition flex items-center justify-center">
+                                <i class="fa-solid fa-address-card text-xs"></i>
                             </button>
-                            <button onclick="enviarWhatsApp('${e.apoderado.tel}', '${e.nombre}', '${e.estado_hoy}')" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-500 hover:text-white transition-colors flex items-center justify-center" title="Aviso a Apoderado por WhatsApp">
-                                <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <button onclick="abrirWhatsApp('${e.apoderado?.tel || ''}', '${e.nombre}', '${e.estado_hoy}')" title="Aviso WhatsApp" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition flex items-center justify-center">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                            </button>
+                            <button onclick="abrirModalJustificar(${e.id}, '${e.nombre}')" title="Justificar Inasistencia" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 transition flex items-center justify-center">
+                                <i class="fa-solid fa-file-signature text-xs"></i>
                             </button>
                         </div>
                     </td>
@@ -239,28 +408,82 @@
             }).join('');
         }
 
-        function abrirModalFicha(id) {
-            const e = appState.estudiantes.find(x => x.id === id);
+        function abrirFicha(id) {
+            const e = estudiantesData.find(x => x.id === id);
+            if (!e) return;
+
             document.getElementById('ficha-nombre').innerText = e.nombre;
             document.getElementById('ficha-grado').innerText = `${e.grado} - Sección ${e.seccion} (${e.nivel})`;
-            document.getElementById('ficha-apoderado-nombre').innerText = e.apoderado.nombre;
-            document.getElementById('ficha-apoderado-tel').innerText = e.apoderado.tel;
-            
+            document.getElementById('ficha-apoderado-nombre').innerText = e.apoderado?.nombre || 'No asignado';
+            document.getElementById('ficha-apoderado-tel').innerText = e.apoderado?.tel || 'Sin teléfono';
+            document.getElementById('ficha-apoderado-correo').innerText = e.apoderado?.correo || 'Sin correo';
+            document.getElementById('ficha-apoderado-dir').innerText = e.apoderado?.direccion || 'Sin dirección';
+
             const btnWa = document.getElementById('btn-ficha-wa');
-            btnWa.onclick = () => enviarWhatsApp(e.apoderado.tel, e.nombre, e.estado_hoy);
+            btnWa.onclick = () => abrirWhatsApp(e.apoderado?.tel, e.nombre, e.estado_hoy);
 
             document.getElementById('modal-ficha').classList.remove('hidden');
         }
-        
-        function cerrarModalFicha() { document.getElementById('modal-ficha').classList.add('hidden'); }
 
-        function enviarWhatsApp(telefono, alumnoNombre, estado) {
-            const url = `https://wa.me/51${telefono}?text=Hola,%20le%20escribimos%20del%20Colegio%20Santa%20Teresa%20por%20su%20menor%20hijo(a)%20${alumnoNombre}`;
+        function abrirWhatsApp(tel, alumno, estado) {
+            if (!tel) {
+                alert('Este alumno no tiene número de celular registrado para el apoderado.');
+                return;
+            }
+            let mensaje = "";
+            if (estado === 'Falta') {
+                mensaje = `🔴 *COMUNICADO URGENTE*: Estimado apoderado del colegio Santa Teresita, le informamos que el estudiante *${alumno}* NO registra ingreso en el lector biométrico el día de hoy. Por favor confirmar el motivo con la institución.`;
+            } else if (estado === 'Tardanza') {
+                mensaje = `🟡 *AVISO DE INGRESO*: Estimado apoderado, le informamos que el estudiante *${alumno}* ha registrado su ingreso con TARDANZA en la institución.`;
+            } else {
+                mensaje = `🟢 Estimado apoderado, nos comunicamos del colegio Santa Teresita con respecto al estudiante *${alumno}*...`;
+            }
+
+            const url = `https://wa.me/51${tel}?text=${encodeURIComponent(mensaje)}`;
             window.open(url, '_blank');
         }
 
-        // Cargar tabla al iniciar
-        renderTablaAuxiliar();
+        function abrirModalJustificar(id, nombre) {
+            document.getElementById('justificar-estudiante-id').value = id;
+            document.getElementById('justificar-alumno-nombre').innerText = nombre;
+            document.getElementById('justificar-motivo').value = '';
+            document.getElementById('modal-justificar').classList.remove('hidden');
+        }
+
+        async function guardarJustificacion(e) {
+            e.preventDefault();
+            const id = document.getElementById('justificar-estudiante-id').value;
+            const motivo = document.getElementById('justificar-motivo').value.trim();
+            const fecha = document.getElementById('filtro-fecha').value;
+
+            try {
+                await fetch('/api/asistencias/justificar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estudiante_id: id, fecha, motivo })
+                });
+            } catch (err) {
+                console.warn(err);
+            }
+
+            // Actualización optimista local
+            const est = estudiantesData.find(x => x.id == id);
+            if (est) est.estado_hoy = 'Justificada';
+            cerrarModal('modal-justificar');
+            filtrarTabla();
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function cerrarSesion() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // Carga inicial
+        cargarAsistencias();
     </script>
 </body>
 </html>

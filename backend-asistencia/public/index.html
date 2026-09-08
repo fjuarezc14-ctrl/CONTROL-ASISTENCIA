@@ -2,43 +2,221 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-width=1.0">
-    <title>Login - Colegio Santa Teresa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Sistema - Control de Asistencia Escolar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background-color: #2c3e50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #1a252f; }
+        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 min-h-screen flex items-center justify-center p-4 font-sans text-slate-800">
 
-    <div class="login-box">
-        <h2>Colegio Santa Teresa</h2>
-        <p>Inicio de Sesión</p>
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 fade-in">
         
-        <input type="text" id="usuario" placeholder="Usuario" required>
-        <input type="password" id="contrasena" placeholder="Contraseña" required>
-        
-        <button onclick="iniciarSesion()">Entrar</button>
-        <p id="mensajeError" style="color: red; display: none;">Usuario o contraseña incorrectos</p>
+        <!-- Encabezado Institucional -->
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 p-8 text-white text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl mx-auto mb-3 flex items-center justify-center border border-white/20 shadow-inner">
+                    <i class="fa-solid fa-school text-2xl text-blue-200"></i>
+                </div>
+                <h1 class="text-2xl font-black tracking-tight">SANTA TERESITA</h1>
+                <p class="text-xs text-blue-200 font-medium tracking-widest uppercase mt-1">Control de Asistencia Biométrico</p>
+            </div>
+            <!-- Círculos decorativos -->
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-blue-500/20 rounded-full blur-xl"></div>
+            <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-indigo-500/20 rounded-full blur-xl"></div>
+        </div>
+
+        <!-- Selector de Rol (Pestañas) -->
+        <div class="p-6 pb-2">
+            <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-2xl text-xs font-bold">
+                <button type="button" id="tab-padre" onclick="seleccionarRol('padre')" class="py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 bg-white text-blue-600 shadow-sm">
+                    <i class="fa-solid fa-users"></i> Padre / Apoderado
+                </button>
+                <button type="button" id="tab-auxiliar" onclick="seleccionarRol('auxiliar')" class="py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800">
+                    <i class="fa-solid fa-id-badge"></i> Personal Escolar
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <form id="login-form" onsubmit="ejecutarLogin(event)" class="p-6 pt-3 space-y-4">
+            
+            <div id="alerta-error" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-xs flex items-center gap-2.5">
+                <i class="fa-solid fa-circle-exclamation text-base shrink-0"></i>
+                <span id="alerta-mensaje">Credenciales incorrectas.</span>
+            </div>
+
+            <!-- Campo Identificador -->
+            <div>
+                <label id="label-identificador" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Número de DNI del Apoderado
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i id="icon-identificador" class="fa-solid fa-address-card text-sm"></i>
+                    </span>
+                    <input type="text" id="identificador" required placeholder="Ej. 45678901" 
+                        class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-slate-50/50">
+                </div>
+                <p id="hint-identificador" class="text-[11px] text-slate-400 mt-1">Ingrese los 8 dígitos de su DNI sin espacios.</p>
+            </div>
+
+            <!-- Campo Contraseña -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Contraseña
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-lock text-sm"></i>
+                    </span>
+                    <input type="password" id="password" required placeholder="••••••••"
+                        class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-slate-50/50">
+                    <button type="button" onclick="toggleVerPassword()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+                        <i id="eye-icon" class="fa-solid fa-eye text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botón de Ingreso -->
+            <button type="submit" id="btn-submit" 
+                class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2 cursor-pointer text-sm">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span id="btn-text">Ingresar al Portal</span>
+            </button>
+
+            <!-- Acceso Rápido / Demos para pruebas -->
+            <div class="pt-4 border-t border-slate-100 text-center">
+                <p class="text-[11px] text-slate-400 mb-2">Accesos directos de prueba (Demo):</p>
+                <div class="flex gap-2 justify-center">
+                    <button type="button" onclick="llenarDemo('padre')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[11px] font-medium transition">
+                        👨‍👩‍👦 Probar como Padre
+                    </button>
+                    <button type="button" onclick="llenarDemo('auxiliar')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[11px] font-medium transition">
+                        📋 Probar como Auxiliar
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="bg-slate-50 p-4 text-center border-t border-slate-100 text-[11px] text-slate-400">
+            Integrado con Terminales Biométricos Faciales ZKTeco &copy; 2026
+        </div>
+
     </div>
 
     <script>
-        function iniciarSesion() {
-            const user = document.getElementById('usuario').value;
-            const pass = document.getElementById('contrasena').value;
+        let rolActual = 'padre';
 
-            // Esto luego lo conectaremos a la base de datos real, 
-            // por ahora simulamos la redirección:
-            if (user === 'papa_juan' && pass === '12345') {
-                window.location.href = 'vista_padre.html';
-            } else if (user === 'aux_maria' && pass === 'admin') {
-                window.location.href = 'vista_auxiliar.html';
+        function seleccionarRol(rol) {
+            rolActual = rol;
+            const tabPadre = document.getElementById('tab-padre');
+            const tabAuxiliar = document.getElementById('tab-auxiliar');
+            const labelId = document.getElementById('label-identificador');
+            const inputId = document.getElementById('identificador');
+            const iconId = document.getElementById('icon-identificador');
+            const hintId = document.getElementById('hint-identificador');
+
+            ocultarError();
+
+            if (rol === 'padre') {
+                tabPadre.className = "py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 bg-white text-blue-600 shadow-sm";
+                tabAuxiliar.className = "py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800";
+                labelId.innerText = "Número de DNI del Apoderado";
+                inputId.placeholder = "Ej. 45678901";
+                iconId.className = "fa-solid fa-address-card text-sm";
+                hintId.innerText = "Ingrese los 8 dígitos de su DNI sin espacios.";
             } else {
-                document.getElementById('mensajeError').style.display = 'block';
+                tabAuxiliar.className = "py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 bg-white text-blue-600 shadow-sm";
+                tabPadre.className = "py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800";
+                labelId.innerText = "Usuario Institucional";
+                inputId.placeholder = "Ej. aux_carmen";
+                iconId.className = "fa-solid fa-user-shield text-sm";
+                hintId.innerText = "Ingrese el usuario asignado por administración.";
             }
+        }
+
+        function llenarDemo(rol) {
+            seleccionarRol(rol);
+            if (rol === 'padre') {
+                document.getElementById('identificador').value = '45678901';
+                document.getElementById('password').value = '12345';
+            } else {
+                document.getElementById('identificador').value = 'aux_carmen';
+                document.getElementById('password').value = '12345';
+            }
+        }
+
+        function toggleVerPassword() {
+            const passInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passInput.type = 'password';
+                eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        async function ejecutarLogin(e) {
+            e.preventDefault();
+            ocultarError();
+
+            const identificador = document.getElementById('identificador').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('btn-submit');
+            const btnText = document.getElementById('btn-text');
+
+            btn.disabled = true;
+            btnText.innerText = "Verificando...";
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identificador, password })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Guardar sesión en sessionStorage
+                    sessionStorage.setItem('usuario_activo', JSON.stringify(data.usuario));
+                    window.location.href = data.redirect;
+                } else {
+                    mostrarError(data.mensaje || 'Credenciales incorrectas');
+                }
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                // Fallback offline en caso de probar archivo directo
+                if (identificador === '45678901' || identificador.length === 8) {
+                    sessionStorage.setItem('usuario_activo', JSON.stringify({ identificador, nombre: 'María Torres Salazar', rol: 'padre' }));
+                    window.location.href = 'vista_padre.html';
+                } else if (identificador === 'aux_carmen' || identificador === 'admin') {
+                    sessionStorage.setItem('usuario_activo', JSON.stringify({ identificador, nombre: 'Carmen Rojas Mendoza', rol: 'auxiliar' }));
+                    window.location.href = 'vista_auxiliar.html';
+                } else {
+                    mostrarError('No se pudo conectar con el servidor.');
+                }
+            } finally {
+                btn.disabled = false;
+                btnText.innerText = "Ingresar al Portal";
+            }
+        }
+
+        function mostrarError(msg) {
+            const alerta = document.getElementById('alerta-error');
+            document.getElementById('alerta-mensaje').innerText = msg;
+            alerta.classList.remove('hidden');
+        }
+
+        function ocultarError() {
+            document.getElementById('alerta-error').classList.add('hidden');
         }
     </script>
 </body>

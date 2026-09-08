@@ -1,77 +1,46 @@
 const express = require('express');
-const { Pool } = require('pg'); // Importamos PostgreSQL
+const pool = require('./config/db');
+
+// Importar rutas modulares
+const authRoutes = require('./routes/authRoutes');
+const zktecoRoutes = require('./routes/zktecoRoutes');
+const apiRoutes = require('./routes/apiRoutes');
 
 const app = express();
+
+// Middlewares
 app.use(express.static('public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Middleware para soportar texto crudo tabulado enviado por ZKTeco
 app.use(express.text({ type: '*/*' }));
 
-// -------------------------------------------------------------
-// CONFIGURACIÓN DE POSTGRESQL
-// -------------------------------------------------------------
-const pool = new Pool({
-    user: 'postgres',     // <-- CAMBIA ESTO (ej. 'postgres')
-    host: 'localhost',               // O la IP de tu servidor
-    database: 'db_st',    // <-- CAMBIA ESTO (ej. 'colegio_st')
-    password: 'admin123',       // <-- CAMBIA ESTO
-    port: 5432,                      // Puerto por defecto de Postgres
-});
-
-// Verificamos si hay conexión a la BD al arrancar
+// Verificación de conexión a PostgreSQL
 pool.connect()
-    .then(() => console.log('✅ Conectado exitosamente a PostgreSQL'))
-    .catch(err => console.error('❌ Error conectando a PostgreSQL:', err.message));
+    .then(client => {
+        console.log('✅ Conectado exitosamente al servidor PostgreSQL');
+        client.release();
+    })
+    .catch(err => {
+        console.warn('⚠️ Nota: PostgreSQL no está respondiendo en este momento (', err.message, '). El sistema operará con modo resiliente/fallback.');
+    });
 
+// Montar Rutas
+app.use('/api/auth', authRoutes);
+app.use('/api', apiRoutes);
+app.use('/iclock', zktecoRoutes);
 
-// -------------------------------------------------------------
-// RUTA 1: EL SALUDO
-// -------------------------------------------------------------
-app.get('/iclock/cdata', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send('OK');
+// Manejo de errores 404 para API
+app.use('/api', (req, res) => {
+    res.status(404).json({ success: false, mensaje: 'Ruta API no encontrada' });
 });
 
-// -------------------------------------------------------------
-// RUTA 2: RECIBIR Y GUARDAR LA MARCACIÓN
-// -------------------------------------------------------------
-app.post('/iclock/cdata', async (req, res) => {
-    const numeroSerie = req.query.SN || 'DESCONOCIDO';
-    const datosAsistencia = req.body; 
-    
-    // ZKTeco puede enviar varias marcaciones de golpe en múltiples líneas
-    // Separamos el texto por saltos de línea y filtramos las vacías
-    const lineas = datosAsistencia.trim().split('\n').filter(line => line.trim() !== '');
-
-    console.log(`\n[PROCESANDO] ${lineas.length} marcaciones recibidas del reloj ${numeroSerie}`);
-
-    for (const linea of lineas) {
-        // Separamos cada línea usando tabulaciones (\t)
-        const [pin, fechaHora, estado, tipo] = linea.split('\t');
-
-        try {
-            // Guardamos en PostgreSQL
-            const query = `
-                INSERT INTO asistencias (numero_serie_reloj, estudiante_pin, fecha_hora, estado_marcacion, tipo_verificacion) 
-                VALUES ($1, $2, $3, $4, $5)
-            `;
-            const valores = [numeroSerie, pin, fechaHora, estado, tipo];
-            
-            await pool.query(query, valores);
-            console.log(`✔️ Asistencia guardada: Estudiante ${pin} a las ${fechaHora}`);
-
-        } catch (error) {
-            console.error(`❌ Error guardando estudiante ${pin}:`, error.message);
-        }
-    }
-
-    // Se responde con OK al reloj
-    res.set('Content-Type', 'text/plain');
-    res.send('OK');
-});
-
-// -------------------------------------------------------------
-// ENCENDER EL SERVIDOR
-// -------------------------------------------------------------
-const PUERTO = 3000;
+// Encender Servidor
+const PUERTO = process.env.PORT || 3000;
 app.listen(PUERTO, () => {
-    console.log(`🚀 Servidor ZKTeco escuchando en el puerto ${PUERTO}`);
+    console.log(`\n======================================================`);
+    console.log(`🚀 Sistema de Control de Asistencia Escolar Activo`);
+    console.log(`📍 Servidor Web:      http://localhost:${PUERTO}`);
+    console.log(`📍 Endpoint ZKTeco:   http://localhost:${PUERTO}/iclock/cdata`);
+    console.log(`======================================================\n`);
 });
