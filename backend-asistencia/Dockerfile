@@ -2,17 +2,16 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Instalar dependencias con tolerancia a fallos
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm install --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps --no-audit --no-fund
 
-# Copiar el resto del código del backend y public
+# Copiar el código fuente
 COPY . .
 
-# Exponer el puerto interno de la aplicación
+# Exponer el puerto interno
 EXPOSE 3000
 
-# Comando de inicio
+# Iniciar servidor
 CMD ["npm", "start"]
